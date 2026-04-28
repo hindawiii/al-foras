@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Award, Newspaper, Bookmark, User, Settings as SettingsIcon, Bell } from "lucide-react";
+import { Award, Newspaper, Bookmark, User, Settings as SettingsIcon, Bell, Coins } from "lucide-react";
 import { BrandMark } from "@/components/foras/Logo";
 import { CurrencyCalculator } from "@/components/foras/CurrencyCalculator";
 import { SettingsSheet } from "@/components/foras/SettingsSheet";
@@ -9,10 +9,13 @@ import { ScholarshipsTab } from "./ScholarshipsTab";
 import { NewsTab } from "./NewsTab";
 import { ApplicationsTab } from "./ApplicationsTab";
 import { ProfileTab } from "./ProfileTab";
+import { CurrencyTab } from "./CurrencyTab";
+import { useLiveNotifications } from "@/hooks/useLiveNotifications";
 
 const tabs = [
   { id: "scholarships" as const, label: "المنح والفرص", icon: Award, comp: ScholarshipsTab },
   { id: "news" as const, label: "الأخبار والاقتصاد", icon: Newspaper, comp: NewsTab },
+  { id: "currency" as const, label: "العملات", icon: Coins, comp: CurrencyTab },
   { id: "applications" as const, label: "طلباتي", icon: Bookmark, comp: ApplicationsTab },
   { id: "profile" as const, label: "الملف الشخصي", icon: User, comp: ProfileTab },
 ];
@@ -22,6 +25,7 @@ export const AppShell = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const Active = tabs.find(t => t.id === tab)!.comp;
+  useLiveNotifications();
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -59,7 +63,7 @@ export const AppShell = () => {
 
       {/* Bottom navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-30 glass border-t border-primary/15">
-        <div className="max-w-2xl mx-auto grid grid-cols-4">
+        <div className="max-w-2xl mx-auto grid grid-cols-5">
           {tabs.map(t => {
             const Icon = t.icon;
             const active = tab === t.id;
@@ -80,7 +84,7 @@ export const AppShell = () => {
         </div>
       </nav>
 
-      <CurrencyCalculator />
+      {tab !== "currency" && <CurrencyCalculator />}
       <SettingsSheet open={settingsOpen} onOpenChange={setSettingsOpen} />
       <NotificationsSheet open={notifOpen} onOpenChange={setNotifOpen} />
     </div>
