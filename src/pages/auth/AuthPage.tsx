@@ -139,15 +139,7 @@ export default function AuthPage() {
 
                   {mode !== "forgot" && (
                     <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <Label className="text-foreground">كلمة المرور</Label>
-                        {mode === "login" && (
-                          <button type="button" onClick={() => setMode("forgot")}
-                            className="text-xs text-primary hover:underline">
-                            نسيت كلمة المرور؟
-                          </button>
-                        )}
-                      </div>
+                      <Label className="text-foreground block text-right">كلمة المرور</Label>
                       <div className="relative">
                         <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input type={showPw ? "text" : "password"} value={password}
@@ -160,6 +152,14 @@ export default function AuthPage() {
                           {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
+                      {mode === "login" && (
+                        <div className="flex justify-end pt-1">
+                          <button type="button" onClick={() => setMode("forgot")}
+                            className="text-xs text-primary hover:underline">
+                            نسيت كلمة المرور؟
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
 
