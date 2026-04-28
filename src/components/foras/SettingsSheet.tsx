@@ -1,4 +1,4 @@
-import { Moon, User, Shield, Info, Trash2, LogOut } from "lucide-react";
+import { Moon, User, Shield, Info, Trash2, LogOut, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { nativeShare } from "@/lib/share";
 
 interface Props { open: boolean; onOpenChange: (v: boolean) => void; }
 
@@ -30,6 +31,14 @@ export const SettingsSheet = ({ open, onOpenChange }: Props) => {
     nav("/auth");
   };
 
+  const handleShareApp = async () => {
+    await nativeShare({
+      title: "الفرص — Al-Foras",
+      text: "اكتشف المنح الدراسية والفرص العالمية والعربية في تطبيق واحد.",
+      url: window.location.origin,
+    });
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="bg-card border-gold/30 w-[88%] sm:max-w-md">
@@ -44,7 +53,13 @@ export const SettingsSheet = ({ open, onOpenChange }: Props) => {
           <Row icon={Info} label="حول التطبيق" onClick={() => toast.info("الفرص v1.0 — منصة المنح والفرص العالمية")} />
           <Row icon={Trash2} label="مسح الملفات المؤقتة" onClick={handleClearCache} />
 
-          <div className="pt-4">
+          <div className="pt-4 space-y-2">
+            <Button variant="outline" size="lg"
+              onClick={handleShareApp}
+              className="w-full bg-card border-gold/40 hover:bg-primary/10 hover:border-primary">
+              <Share2 className="w-4 h-4 ml-2" />
+              مشاركة التطبيق
+            </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="danger" size="lg" className="w-full">

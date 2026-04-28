@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Award, Newspaper, Bookmark, User, Settings as SettingsIcon } from "lucide-react";
+import { Award, Newspaper, Bookmark, User, Settings as SettingsIcon, Bell } from "lucide-react";
 import { BrandMark } from "@/components/foras/Logo";
 import { CurrencyCalculator } from "@/components/foras/CurrencyCalculator";
 import { SettingsSheet } from "@/components/foras/SettingsSheet";
+import { NotificationsSheet } from "@/components/foras/NotificationsSheet";
 import { ScholarshipsTab } from "./ScholarshipsTab";
 import { NewsTab } from "./NewsTab";
 import { ApplicationsTab } from "./ApplicationsTab";
@@ -19,6 +20,7 @@ const tabs = [
 export const AppShell = () => {
   const [tab, setTab] = useState<typeof tabs[number]["id"]>("scholarships");
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const Active = tabs.find(t => t.id === tab)!.comp;
 
   return (
@@ -27,11 +29,19 @@ export const AppShell = () => {
       <header className="sticky top-0 z-30 glass border-b border-primary/10">
         <div className="max-w-2xl mx-auto px-5 py-4 flex justify-between items-center">
           <BrandMark />
-          <button onClick={() => setSettingsOpen(true)}
-            className="w-11 h-11 rounded-xl bg-card border border-primary/20 hover:border-primary hover:bg-primary/10 transition-all flex items-center justify-center"
-            aria-label="الإعدادات">
-            <SettingsIcon className="w-5 h-5 text-primary" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setNotifOpen(true)}
+              className="relative w-11 h-11 rounded-xl bg-card border border-primary/20 hover:border-primary hover:bg-primary/10 transition-all flex items-center justify-center"
+              aria-label="الإشعارات">
+              <Bell className="w-5 h-5 text-primary" />
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-destructive ring-2 ring-card" />
+            </button>
+            <button onClick={() => setSettingsOpen(true)}
+              className="w-11 h-11 rounded-xl bg-card border border-primary/20 hover:border-primary hover:bg-primary/10 transition-all flex items-center justify-center"
+              aria-label="الإعدادات">
+              <SettingsIcon className="w-5 h-5 text-primary" />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -72,6 +82,7 @@ export const AppShell = () => {
 
       <CurrencyCalculator />
       <SettingsSheet open={settingsOpen} onOpenChange={setSettingsOpen} />
+      <NotificationsSheet open={notifOpen} onOpenChange={setNotifOpen} />
     </div>
   );
 };
