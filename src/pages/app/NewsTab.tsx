@@ -45,7 +45,7 @@ export const NewsTab = () => {
         })}
       </div>
 
-      <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3 pb-32">
         {items.map((item, i) => <NewsCard key={item.id} item={item} index={i} textOnly={textOnly} />)}
       </div>
     </div>
