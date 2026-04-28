@@ -108,7 +108,6 @@ export const NEWS: NewsItem[] = [
   { id: "n6", category: "economy", title: "البنك المركزي الأوروبي يبقي أسعار الفائدة دون تغيير", summary: "قرار متوقع من قبل المحللين وسط استقرار التضخم.", time: "قبل 8 ساعات", source: "Bloomberg" },
 ];
 
-export const CURRENCIES = [
 export interface Currency {
   code: string;
   name: string;
