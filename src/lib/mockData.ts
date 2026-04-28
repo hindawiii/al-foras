@@ -109,16 +109,26 @@ export const NEWS: NewsItem[] = [
 ];
 
 export const CURRENCIES = [
-  { code: "USD", name: "دولار أمريكي", rate: 1 },
-  { code: "EUR", name: "يورو", rate: 0.92 },
-  { code: "SAR", name: "ريال سعودي", rate: 3.75 },
-  { code: "AED", name: "درهم إماراتي", rate: 3.67 },
-  { code: "QTR", name: "ريال قطري", rate: 3.64 },
-  { code: "SDG", name: "جنيه سوداني", rate: 600 },
-  { code: "EGP", name: "جنيه مصري", rate: 49 },
-  { code: "DZD", name: "دينار جزائري", rate: 134 },
-  { code: "MAD", name: "درهم مغربي", rate: 9.95 },
-  { code: "GOLD", name: "غرام ذهب 24", rate: 0.0144 },
+export interface Currency {
+  code: string;
+  name: string;
+  rate: number;
+  flag: string;
+  symbol: string;
+  apiCode?: string; // code used by external rates API
+}
+
+export const CURRENCIES: Currency[] = [
+  { code: "USD", name: "دولار أمريكي", rate: 1,      flag: "🇺🇸", symbol: "$",   apiCode: "USD" },
+  { code: "EUR", name: "يورو",          rate: 0.92,  flag: "🇪🇺", symbol: "€",   apiCode: "EUR" },
+  { code: "SAR", name: "ريال سعودي",    rate: 3.75,  flag: "🇸🇦", symbol: "ر.س", apiCode: "SAR" },
+  { code: "AED", name: "درهم إماراتي",  rate: 3.67,  flag: "🇦🇪", symbol: "د.إ", apiCode: "AED" },
+  { code: "QTR", name: "ريال قطري",     rate: 3.64,  flag: "🇶🇦", symbol: "ر.ق", apiCode: "QAR" },
+  { code: "SDG", name: "جنيه سوداني",   rate: 600,   flag: "🇸🇩", symbol: "ج.س", apiCode: "SDG" },
+  { code: "EGP", name: "جنيه مصري",     rate: 49,    flag: "🇪🇬", symbol: "ج.م", apiCode: "EGP" },
+  { code: "DZD", name: "دينار جزائري",  rate: 134,   flag: "🇩🇿", symbol: "د.ج", apiCode: "DZD" },
+  { code: "MAD", name: "درهم مغربي",    rate: 9.95,  flag: "🇲🇦", symbol: "د.م", apiCode: "MAD" },
+  { code: "GOLD", name: "غرام ذهب 24",  rate: 0.0144, flag: "🥇", symbol: "g",   apiCode: "XAU" },
 ];
 
 export const INTEREST_OPTIONS = [
