@@ -41,12 +41,12 @@ export const SettingsSheet = ({ open, onOpenChange }: Props) => {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="bg-card border-gold/30 w-[88%] sm:max-w-md">
-        <SheetHeader>
+      <SheetContent side="left" className="bg-card border-gold/30 w-[88%] sm:max-w-md flex flex-col p-0">
+        <SheetHeader className="px-6 pt-6 pb-2 flex-shrink-0">
           <SheetTitle className="text-gold-gradient font-display text-2xl text-right">الإعدادات</SheetTitle>
         </SheetHeader>
 
-        <div className="space-y-2 mt-8">
+        <div className="flex-1 overflow-y-auto px-6 pb-8 space-y-2 mt-4">
           <Row icon={Moon} label="الوضع الليلي" trailing={<Switch checked={darkMode} onCheckedChange={toggleDarkMode} />} />
           <Row icon={User} label="إعدادات الحساب" onClick={() => toast.info("قريباً")} />
           <Row icon={Shield} label="الخصوصية" onClick={() => toast.info("سياسة الخصوصية قريباً")} />

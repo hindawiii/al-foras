@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, useMotionValue } from "framer-motion";
 import { Calculator, X, ArrowLeftRight } from "lucide-react";
 import { CURRENCIES } from "@/lib/mockData";
+import { useLiveRates } from "@/hooks/useLiveRates";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -18,6 +19,7 @@ export const CurrencyCalculator = () => {
   const dragStart = useRef({ x: 0, y: 0 });
   const moved = useRef(false);
   const idleTimer = useRef<number | null>(null);
+  const { rates, updatedAt } = useLiveRates();
 
   const wakeUp = () => {
     setIdle(false);
@@ -30,8 +32,8 @@ export const CurrencyCalculator = () => {
     return () => { if (idleTimer.current) window.clearTimeout(idleTimer.current); };
   }, []);
 
-  const fromRate = CURRENCIES.find(c => c.code === from)?.rate ?? 1;
-  const toRate = CURRENCIES.find(c => c.code === to)?.rate ?? 1;
+  const fromRate = rates[from] ?? CURRENCIES.find(c => c.code === from)?.rate ?? 1;
+  const toRate = rates[to] ?? CURRENCIES.find(c => c.code === to)?.rate ?? 1;
   const result = ((parseFloat(amount) || 0) / fromRate * toRate).toLocaleString("en-US", { maximumFractionDigits: 4 });
 
   return (
@@ -134,7 +136,9 @@ export const CurrencyCalculator = () => {
             </div>
 
             <div className="text-xs text-muted-foreground text-center">
-              الأسعار للعرض التوضيحي. سيتم ربطها لاحقاً بمصدر بيانات حي.
+              {updatedAt
+                ? `أسعار حية — آخر تحديث ${updatedAt.toLocaleTimeString("ar-EG")}`
+                : "جارٍ جلب أحدث الأسعار..."}
             </div>
           </div>
         </SheetContent>

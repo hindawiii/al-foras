@@ -99,26 +99,41 @@ export interface NewsItem {
 
 export const NEWS: NewsItem[] = [
   { id: "n1", category: "economy", title: "ارتفاع الذهب لأعلى مستوياته خلال شهر", summary: "سجل سعر الذهب ارتفاعاً ملحوظاً مع تراجع الدولار الأمريكي.", time: "قبل ساعة", source: "رويترز",
+    image: "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=800&auto=format&fit=crop&q=70",
     aiLink: "هذا الارتفاع قد يؤثر على المنح الممولة بالدولار — راجع منح فولبرايت." },
   { id: "n2", category: "global", title: "الاتحاد الأوروبي يوسع برامج المنح للطلاب الدوليين", summary: "إعلان عن زيادة مخصصات إيراسموس بنسبة 15% للعام القادم.", time: "قبل 3 ساعات", source: "EU News",
+    image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&auto=format&fit=crop&q=70",
     aiLink: "فرصة جديدة! تحقق من برنامج إيراسموس موندوس في صفحة المنح." },
-  { id: "n3", category: "local", title: "افتتاح مركز ابتكار جديد في الرياض", summary: "يستهدف المركز دعم رواد الأعمال والباحثين الشباب.", time: "قبل 5 ساعات", source: "العربية" },
-  { id: "n4", category: "sports", title: "كأس العالم 2026: التحضيرات تدخل مرحلتها النهائية", summary: "ثلاث دول مستضيفة تستعد لاستقبال أكبر بطولة كروية.", time: "قبل 6 ساعات", source: "BBC" },
-  { id: "n5", category: "weather", title: "موجة حر متوقعة على دول الخليج", summary: "هيئة الأرصاد تحذر من ارتفاع درجات الحرارة الأسبوع القادم.", time: "قبل ساعتين", source: "الأرصاد" },
-  { id: "n6", category: "economy", title: "البنك المركزي الأوروبي يبقي أسعار الفائدة دون تغيير", summary: "قرار متوقع من قبل المحللين وسط استقرار التضخم.", time: "قبل 8 ساعات", source: "Bloomberg" },
+  { id: "n3", category: "local", title: "افتتاح مركز ابتكار جديد في الرياض", summary: "يستهدف المركز دعم رواد الأعمال والباحثين الشباب.", time: "قبل 5 ساعات", source: "العربية",
+    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=70" },
+  { id: "n4", category: "sports", title: "كأس العالم 2026: التحضيرات تدخل مرحلتها النهائية", summary: "ثلاث دول مستضيفة تستعد لاستقبال أكبر بطولة كروية.", time: "قبل 6 ساعات", source: "BBC",
+    image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&auto=format&fit=crop&q=70" },
+  { id: "n5", category: "weather", title: "موجة حر متوقعة على دول الخليج", summary: "هيئة الأرصاد تحذر من ارتفاع درجات الحرارة الأسبوع القادم.", time: "قبل ساعتين", source: "الأرصاد",
+    image: "https://images.unsplash.com/photo-1561489413-985b06da5bee?w=800&auto=format&fit=crop&q=70" },
+  { id: "n6", category: "economy", title: "البنك المركزي الأوروبي يبقي أسعار الفائدة دون تغيير", summary: "قرار متوقع من قبل المحللين وسط استقرار التضخم.", time: "قبل 8 ساعات", source: "Bloomberg",
+    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=70" },
 ];
 
-export const CURRENCIES = [
-  { code: "USD", name: "دولار أمريكي", rate: 1 },
-  { code: "EUR", name: "يورو", rate: 0.92 },
-  { code: "SAR", name: "ريال سعودي", rate: 3.75 },
-  { code: "AED", name: "درهم إماراتي", rate: 3.67 },
-  { code: "QTR", name: "ريال قطري", rate: 3.64 },
-  { code: "SDG", name: "جنيه سوداني", rate: 600 },
-  { code: "EGP", name: "جنيه مصري", rate: 49 },
-  { code: "DZD", name: "دينار جزائري", rate: 134 },
-  { code: "MAD", name: "درهم مغربي", rate: 9.95 },
-  { code: "GOLD", name: "غرام ذهب 24", rate: 0.0144 },
+export interface Currency {
+  code: string;
+  name: string;
+  rate: number;
+  flag: string;
+  symbol: string;
+  apiCode?: string; // code used by external rates API
+}
+
+export const CURRENCIES: Currency[] = [
+  { code: "USD", name: "دولار أمريكي", rate: 1,      flag: "🇺🇸", symbol: "$",   apiCode: "USD" },
+  { code: "EUR", name: "يورو",          rate: 0.92,  flag: "🇪🇺", symbol: "€",   apiCode: "EUR" },
+  { code: "SAR", name: "ريال سعودي",    rate: 3.75,  flag: "🇸🇦", symbol: "ر.س", apiCode: "SAR" },
+  { code: "AED", name: "درهم إماراتي",  rate: 3.67,  flag: "🇦🇪", symbol: "د.إ", apiCode: "AED" },
+  { code: "QTR", name: "ريال قطري",     rate: 3.64,  flag: "🇶🇦", symbol: "ر.ق", apiCode: "QAR" },
+  { code: "SDG", name: "جنيه سوداني",   rate: 600,   flag: "🇸🇩", symbol: "ج.س", apiCode: "SDG" },
+  { code: "EGP", name: "جنيه مصري",     rate: 49,    flag: "🇪🇬", symbol: "ج.م", apiCode: "EGP" },
+  { code: "DZD", name: "دينار جزائري",  rate: 134,   flag: "🇩🇿", symbol: "د.ج", apiCode: "DZD" },
+  { code: "MAD", name: "درهم مغربي",    rate: 9.95,  flag: "🇲🇦", symbol: "د.م", apiCode: "MAD" },
+  { code: "GOLD", name: "غرام ذهب 24",  rate: 0.0144, flag: "🥇", symbol: "g",   apiCode: "XAU" },
 ];
 
 export const INTEREST_OPTIONS = [

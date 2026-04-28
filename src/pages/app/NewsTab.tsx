@@ -45,7 +45,7 @@ export const NewsTab = () => {
         })}
       </div>
 
-      <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3 pb-32">
         {items.map((item, i) => <NewsCard key={item.id} item={item} index={i} textOnly={textOnly} />)}
       </div>
     </div>
@@ -57,20 +57,33 @@ const NewsCard = ({ item, index, textOnly }: { item: NewsItem; index: number; te
     initial={{ opacity: 0, y: 15 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: index * 0.05 }}
-    className="bg-card-gradient border border-border hover:border-primary/40 rounded-2xl p-5 transition-all"
+    className="group bg-card-gradient border border-border hover:border-primary/40 rounded-2xl overflow-hidden transition-all flex flex-col"
   >
-    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-      <span className="text-primary font-medium">{item.source}</span>
-      <span>•</span>
-      <span>{item.time}</span>
-    </div>
-    <h3 className="font-display text-lg text-foreground mb-2 leading-snug">{item.title}</h3>
-    {!textOnly && <p className="text-sm text-muted-foreground leading-relaxed">{item.summary}</p>}
-    {item.aiLink && (
-      <div className="mt-3 flex items-start gap-2 bg-primary/10 border border-primary/30 rounded-xl p-3">
-        <Sparkles className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-        <p className="text-xs text-primary font-medium leading-relaxed">{item.aiLink}</p>
+    {!textOnly && item.image && (
+      <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+        <img src={item.image} alt={item.title} loading="lazy"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
+        <span className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm text-[10px] text-primary font-bold px-2 py-0.5 rounded-full border border-primary/30">
+          {item.source}
+        </span>
       </div>
     )}
+    <div className="p-3 flex flex-col flex-1 text-right">
+      <div className="flex items-center justify-end gap-2 text-[10px] text-muted-foreground mb-1.5">
+        {(textOnly || !item.image) && <span className="text-primary font-medium">{item.source}</span>}
+        <span>{item.time}</span>
+      </div>
+      <h3 className="font-display text-sm text-foreground mb-1.5 leading-snug line-clamp-2">{item.title}</h3>
+      {!textOnly && (
+        <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-3">{item.summary}</p>
+      )}
+      {item.aiLink && (
+        <div className="mt-2 flex items-start gap-1.5 bg-primary/10 border border-primary/30 rounded-lg p-2">
+          <Sparkles className="w-3 h-3 text-primary flex-shrink-0 mt-0.5" />
+          <p className="text-[10px] text-primary font-medium leading-relaxed line-clamp-2">{item.aiLink}</p>
+        </div>
+      )}
+    </div>
   </motion.article>
 );
