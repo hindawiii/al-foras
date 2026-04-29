@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { RefreshCw, TrendingUp, TrendingDown, Coins, Gem, Bitcoin } from "lucide-react";
 import { useLiveRates, enrichCurrencies } from "@/hooks/useLiveRates";
 import { useCryptoGold } from "@/hooks/useCryptoGold";
+import { FinanceToolsHeader } from "@/components/foras/FinanceToolsHeader";
 
 export const CurrencyTab = () => {
   const { rates, updatedAt, loading, error } = useLiveRates();
@@ -11,6 +12,8 @@ export const CurrencyTab = () => {
 
   return (
     <div className="space-y-4 pb-32">
+      <FinanceToolsHeader />
+
       {/* Hero header — Currency & Gold Hub */}
       <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-card-gradient p-5 shadow-luxe">
         <div className="absolute -top-12 -left-12 w-48 h-48 bg-primary/15 rounded-full blur-3xl" />
