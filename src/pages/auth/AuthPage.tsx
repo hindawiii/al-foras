@@ -95,7 +95,7 @@ export default function AuthPage() {
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md"
         >
-          <div className="glass rounded-3xl p-8 shadow-luxe">
+          <div className="glass rounded-3xl p-8 shadow-luxe text-right" dir="rtl">
             <AnimatePresence mode="wait">
               <motion.div
                 key={mode}
@@ -104,12 +104,12 @@ export default function AuthPage() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.25 }}
               >
-                <h1 className="font-display text-3xl text-gold-gradient mb-2">
+                <h1 className="font-display text-3xl text-gold-gradient mb-2 text-right">
                   {mode === "login" && "تسجيل الدخول"}
                   {mode === "signup" && "إنشاء حساب جديد"}
                   {mode === "forgot" && "استعادة كلمة المرور"}
                 </h1>
-                <p className="text-muted-foreground text-sm mb-8">
+                <p className="text-muted-foreground text-sm mb-8 text-right">
                   {mode === "login" && "أهلاً بك مجدداً في الفرص"}
                   {mode === "signup" && "ابدأ رحلتك نحو فرصتك القادمة"}
                   {mode === "forgot" && "أدخل بريدك وسنرسل لك رابط الاستعادة"}
@@ -118,7 +118,7 @@ export default function AuthPage() {
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {mode === "signup" && (
                     <div className="space-y-2">
-                      <Label className="text-foreground">الاسم الكامل</Label>
+                      <Label className="text-foreground block text-right">الاسم الكامل</Label>
                       <div className="relative">
                         <UserIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input value={name} onChange={e => setName(e.target.value)}
@@ -128,12 +128,12 @@ export default function AuthPage() {
                     </div>
                   )}
                   <div className="space-y-2">
-                    <Label className="text-foreground">البريد الإلكتروني</Label>
+                    <Label className="text-foreground block text-right">البريد الإلكتروني</Label>
                     <div className="relative">
-                      <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                       <Input type="email" value={email} onChange={e => setEmail(e.target.value)}
                         placeholder="example@email.com"
-                        className="pr-10 h-12 bg-input border-gold/30 focus:border-primary text-right" dir="ltr" />
+                        className="pl-10 pr-3 h-12 bg-input border-gold/30 focus:border-primary text-left" dir="ltr" />
                     </div>
                   </div>
 
@@ -141,19 +141,19 @@ export default function AuthPage() {
                     <div className="space-y-2">
                       <Label className="text-foreground block text-right">كلمة المرور</Label>
                       <div className="relative">
-                        <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                         <Input type={showPw ? "text" : "password"} value={password}
                           onChange={e => setPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="pr-10 pl-10 h-12 bg-input border-gold/30 focus:border-primary" dir="ltr" />
+                          className="pl-10 pr-10 h-12 bg-input border-gold/30 focus:border-primary text-left" dir="ltr" />
                         <button type="button" onClick={() => setShowPw(!showPw)}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
                           aria-label="إظهار كلمة المرور">
                           {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                       {mode === "login" && (
-                        <div className="flex justify-end pt-1">
+                        <div className="flex justify-start pt-1">
                           <button type="button" onClick={() => setMode("forgot")}
                             className="text-xs text-primary hover:underline">
                             نسيت كلمة المرور؟
