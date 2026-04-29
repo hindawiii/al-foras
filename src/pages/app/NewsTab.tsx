@@ -4,6 +4,7 @@ import { Newspaper, Globe2, Trophy, TrendingUp, CloudSun, Sparkles, FileText } f
 import { NEWS, NewsItem } from "@/lib/mockData";
 import { useSettings } from "@/contexts/SettingsContext";
 import { Switch } from "@/components/ui/switch";
+import { WeatherWidget } from "@/components/foras/WeatherWidget";
 
 const cats = [
   { id: "all" as const, label: "الكل", icon: Newspaper },
@@ -21,6 +22,8 @@ export const NewsTab = () => {
 
   return (
     <div className="space-y-4 pb-24">
+      <WeatherWidget />
+
       <div className="flex items-center justify-between glass rounded-2xl p-3">
         <div className="flex items-center gap-2">
           <FileText className="w-4 h-4 text-primary" />
