@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
-import { BadgeCheck, Clock, Award, X, Heart, Search, Link2, Share2, Sparkles, GraduationCap, Banknote, ChevronDown } from "lucide-react";
+import { BadgeCheck, Clock, X, Heart, Search, Link2, Share2, Sparkles, GraduationCap, Banknote, ChevronDown } from "lucide-react";
 import { Scholarship } from "@/lib/mockData";
 import { nativeShare } from "@/lib/share";
 
