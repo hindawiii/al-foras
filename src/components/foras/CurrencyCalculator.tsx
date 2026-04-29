@@ -89,32 +89,32 @@ export const CurrencyCalculator = () => {
       </motion.div>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="bottom" className="bg-card border-gold/30 rounded-t-3xl max-h-[90vh] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle className="text-gold-gradient font-display text-2xl text-right">
+        <SheetContent side="bottom" className="bg-card border-gold/30 rounded-t-3xl max-h-[85vh] overflow-y-auto p-4">
+          <SheetHeader className="pb-1">
+            <SheetTitle className="text-gold-gradient font-display text-lg text-right">
               حاسبة العملات والذهب الحية
             </SheetTitle>
           </SheetHeader>
 
-          <Tabs defaultValue="currency" className="pt-5" dir="rtl">
-            <TabsList className="grid grid-cols-2 w-full bg-input border border-gold/30 h-12">
-              <TabsTrigger value="currency" className="data-[state=active]:bg-gold-gradient data-[state=active]:text-primary-foreground gap-2">
-                <Coins className="w-4 h-4" /> حاسبة العملات
+          <Tabs defaultValue="currency" className="pt-3" dir="rtl">
+            <TabsList className="grid grid-cols-2 w-full bg-input border border-gold/30 h-9">
+              <TabsTrigger value="currency" className="data-[state=active]:bg-gold-gradient data-[state=active]:text-primary-foreground gap-1.5 text-xs h-7">
+                <Coins className="w-3.5 h-3.5" /> العملات
               </TabsTrigger>
-              <TabsTrigger value="gold" className="data-[state=active]:bg-gold-gradient data-[state=active]:text-primary-foreground gap-2">
-                <Gem className="w-4 h-4" /> حاسبة الذهب
+              <TabsTrigger value="gold" className="data-[state=active]:bg-gold-gradient data-[state=active]:text-primary-foreground gap-1.5 text-xs h-7">
+                <Gem className="w-3.5 h-3.5" /> الذهب
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="currency" className="space-y-5 pt-5">
-            <div className="bg-card-gradient border-gold rounded-2xl p-5 space-y-4">
+            <TabsContent value="currency" className="space-y-2 pt-3">
+            <div className="bg-card-gradient border-gold rounded-xl p-3 space-y-2">
               <div>
-                <label className="text-xs text-muted-foreground mb-2 block">من</label>
-                <div className="flex gap-2">
+                <label className="text-[10px] text-muted-foreground mb-1 block">من</label>
+                <div className="flex gap-1.5">
                   <Input type="number" value={amount} onChange={e => setAmount(e.target.value)}
-                    className="h-12 text-xl font-bold text-right bg-input border-gold/30" dir="ltr" />
+                    className="h-9 text-base font-bold text-right bg-input border-gold/30" dir="ltr" />
                   <Select value={from} onValueChange={setFrom}>
-                    <SelectTrigger className="w-32 h-12 bg-input border-gold/30 font-bold"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="w-24 h-9 bg-input border-gold/30 font-bold text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent className="bg-popover border-gold/30">
                       {CURRENCIES.map(c => (
                         <SelectItem key={c.code} value={c.code}>
@@ -128,19 +128,20 @@ export const CurrencyCalculator = () => {
               </div>
 
               <div className="flex justify-center">
-                <Button variant="ghostGold" size="icon" onClick={() => { const t = from; setFrom(to); setTo(t); }}>
-                  <ArrowLeftRight className="w-4 h-4" />
+                <Button variant="ghostGold" size="icon" className="h-7 w-7"
+                  onClick={() => { const t = from; setFrom(to); setTo(t); }}>
+                  <ArrowLeftRight className="w-3.5 h-3.5" />
                 </Button>
               </div>
 
               <div>
-                <label className="text-xs text-muted-foreground mb-2 block">إلى</label>
-                <div className="flex gap-2">
-                  <div className="flex-1 h-12 px-3 rounded-md bg-input border border-primary/40 flex items-center justify-end">
-                    <span className="text-2xl font-bold text-gold-gradient" dir="ltr">{result}</span>
+                <label className="text-[10px] text-muted-foreground mb-1 block">إلى</label>
+                <div className="flex gap-1.5">
+                  <div className="flex-1 h-9 px-2 rounded-md bg-input border border-primary/40 flex items-center justify-end">
+                    <span className="text-base font-bold text-gold-gradient" dir="ltr">{result}</span>
                   </div>
                   <Select value={to} onValueChange={setTo}>
-                    <SelectTrigger className="w-32 h-12 bg-input border-gold/30 font-bold"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="w-24 h-9 bg-input border-gold/30 font-bold text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent className="bg-popover border-gold/30">
                       {CURRENCIES.map(c => (
                         <SelectItem key={c.code} value={c.code}>
@@ -154,24 +155,25 @@ export const CurrencyCalculator = () => {
               </div>
             </div>
 
-            <div className="text-xs text-muted-foreground text-center">
+            <div className="text-[10px] text-muted-foreground text-center">
               {updatedAt
                 ? `أسعار حية — آخر تحديث ${updatedAt.toLocaleTimeString("ar-EG")}`
                 : "جارٍ جلب أحدث الأسعار..."}
             </div>
             </TabsContent>
 
-            <TabsContent value="gold" className="space-y-5 pt-5">
-              <div className="bg-card-gradient border-gold rounded-2xl p-5 space-y-4">
-                <div>
-                  <label className="text-xs text-muted-foreground mb-2 block">الوزن (غرام)</label>
-                  <Input type="number" value={grams} onChange={e => setGrams(e.target.value)}
-                    className="h-12 text-xl font-bold text-right bg-input border-gold/30" dir="ltr" />
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground mb-2 block">العيار</label>
+            <TabsContent value="gold" className="space-y-2 pt-3">
+              <div className="bg-card-gradient border-gold rounded-xl p-3 space-y-2">
+                <div className="flex gap-1.5">
+                  <div className="flex-1">
+                    <label className="text-[10px] text-muted-foreground mb-1 block">الوزن (غ)</label>
+                    <Input type="number" value={grams} onChange={e => setGrams(e.target.value)}
+                      className="h-9 text-base font-bold text-right bg-input border-gold/30" dir="ltr" />
+                  </div>
+                  <div className="w-24">
+                  <label className="text-[10px] text-muted-foreground mb-1 block">العيار</label>
                   <Select value={karat} onValueChange={setKarat}>
-                    <SelectTrigger className="h-12 bg-input border-gold/30 font-bold"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="h-9 bg-input border-gold/30 font-bold text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent className="bg-popover border-gold/30">
                       {GOLD_KARATS.map(k => (
                         <SelectItem key={k.label} value={k.label}>
@@ -180,20 +182,21 @@ export const CurrencyCalculator = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  </div>
                 </div>
                 <div className="pt-2 border-t border-border/40">
-                  <p className="text-xs text-muted-foreground mb-1">القيمة التقديرية</p>
-                  <p className="text-3xl font-bold text-gold-gradient" dir="ltr">
-                    {goldResult} <span className="text-base text-muted-foreground">USD</span>
+                  <p className="text-[10px] text-muted-foreground mb-0.5">القيمة التقديرية</p>
+                  <p className="text-xl font-bold text-gold-gradient" dir="ltr">
+                    {goldResult} <span className="text-xs text-muted-foreground">USD</span>
                   </p>
                   {goldPricePerGram && (
-                    <p className="text-[11px] text-muted-foreground mt-1" dir="ltr">
+                    <p className="text-[10px] text-muted-foreground mt-1" dir="ltr">
                       Base: {goldPricePerGram.toFixed(2)} USD / g (24K)
                     </p>
                   )}
                 </div>
               </div>
-              <div className="text-xs text-muted-foreground text-center">
+              <div className="text-[10px] text-muted-foreground text-center">
                 {goldUpdatedAt
                   ? `سعر الذهب الحي — آخر تحديث ${goldUpdatedAt.toLocaleTimeString("ar-EG")}`
                   : "جارٍ جلب سعر الذهب..."}
