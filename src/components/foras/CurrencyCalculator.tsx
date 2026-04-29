@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, useMotionValue } from "framer-motion";
-import { Calculator, X, ArrowLeftRight } from "lucide-react";
+import { Calculator, ArrowLeftRight, Coins, Gem } from "lucide-react";
 import { CURRENCIES } from "@/lib/mockData";
 import { useLiveRates } from "@/hooks/useLiveRates";
+import { useCryptoGold, GOLD_KARATS } from "@/hooks/useCryptoGold";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const CurrencyCalculator = () => {
   const [open, setOpen] = useState(false);
@@ -20,6 +22,9 @@ export const CurrencyCalculator = () => {
   const moved = useRef(false);
   const idleTimer = useRef<number | null>(null);
   const { rates, updatedAt } = useLiveRates();
+  const { goldPricePerGram, updatedAt: goldUpdatedAt } = useCryptoGold();
+  const [grams, setGrams] = useState("10");
+  const [karat, setKarat] = useState("21K");
 
   const wakeUp = () => {
     setIdle(false);
@@ -35,6 +40,10 @@ export const CurrencyCalculator = () => {
   const fromRate = rates[from] ?? CURRENCIES.find(c => c.code === from)?.rate ?? 1;
   const toRate = rates[to] ?? CURRENCIES.find(c => c.code === to)?.rate ?? 1;
   const result = ((parseFloat(amount) || 0) / fromRate * toRate).toLocaleString("en-US", { maximumFractionDigits: 4 });
+
+  const karatFactor = GOLD_KARATS.find(k => k.label === karat)?.factor ?? 1;
+  const gramValue = (parseFloat(grams) || 0) * (goldPricePerGram ?? 0) * karatFactor;
+  const goldResult = gramValue.toLocaleString("en-US", { maximumFractionDigits: 2 });
 
   return (
     <>
@@ -80,14 +89,24 @@ export const CurrencyCalculator = () => {
       </motion.div>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="bottom" className="bg-card border-gold/30 rounded-t-3xl max-h-[85vh]">
+        <SheetContent side="bottom" className="bg-card border-gold/30 rounded-t-3xl max-h-[90vh] overflow-y-auto">
           <SheetHeader>
             <SheetTitle className="text-gold-gradient font-display text-2xl text-right">
               حاسبة العملات والذهب الحية
             </SheetTitle>
           </SheetHeader>
 
-          <div className="space-y-5 pt-6">
+          <Tabs defaultValue="currency" className="pt-5" dir="rtl">
+            <TabsList className="grid grid-cols-2 w-full bg-input border border-gold/30 h-12">
+              <TabsTrigger value="currency" className="data-[state=active]:bg-gold-gradient data-[state=active]:text-primary-foreground gap-2">
+                <Coins className="w-4 h-4" /> حاسبة العملات
+              </TabsTrigger>
+              <TabsTrigger value="gold" className="data-[state=active]:bg-gold-gradient data-[state=active]:text-primary-foreground gap-2">
+                <Gem className="w-4 h-4" /> حاسبة الذهب
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="currency" className="space-y-5 pt-5">
             <div className="bg-card-gradient border-gold rounded-2xl p-5 space-y-4">
               <div>
                 <label className="text-xs text-muted-foreground mb-2 block">من</label>
@@ -140,7 +159,47 @@ export const CurrencyCalculator = () => {
                 ? `أسعار حية — آخر تحديث ${updatedAt.toLocaleTimeString("ar-EG")}`
                 : "جارٍ جلب أحدث الأسعار..."}
             </div>
-          </div>
+            </TabsContent>
+
+            <TabsContent value="gold" className="space-y-5 pt-5">
+              <div className="bg-card-gradient border-gold rounded-2xl p-5 space-y-4">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-2 block">الوزن (غرام)</label>
+                  <Input type="number" value={grams} onChange={e => setGrams(e.target.value)}
+                    className="h-12 text-xl font-bold text-right bg-input border-gold/30" dir="ltr" />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-2 block">العيار</label>
+                  <Select value={karat} onValueChange={setKarat}>
+                    <SelectTrigger className="h-12 bg-input border-gold/30 font-bold"><SelectValue /></SelectTrigger>
+                    <SelectContent className="bg-popover border-gold/30">
+                      {GOLD_KARATS.map(k => (
+                        <SelectItem key={k.label} value={k.label}>
+                          <span className="font-bold text-primary">{k.label}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="pt-2 border-t border-border/40">
+                  <p className="text-xs text-muted-foreground mb-1">القيمة التقديرية</p>
+                  <p className="text-3xl font-bold text-gold-gradient" dir="ltr">
+                    {goldResult} <span className="text-base text-muted-foreground">USD</span>
+                  </p>
+                  {goldPricePerGram && (
+                    <p className="text-[11px] text-muted-foreground mt-1" dir="ltr">
+                      Base: {goldPricePerGram.toFixed(2)} USD / g (24K)
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="text-xs text-muted-foreground text-center">
+                {goldUpdatedAt
+                  ? `سعر الذهب الحي — آخر تحديث ${goldUpdatedAt.toLocaleTimeString("ar-EG")}`
+                  : "جارٍ جلب سعر الذهب..."}
+              </div>
+            </TabsContent>
+          </Tabs>
         </SheetContent>
       </Sheet>
     </>
