@@ -51,10 +51,14 @@ export const FinanceToolsHeader = () => {
               <Input type="number" value={amount} onChange={e => setAmount(e.target.value)}
                 className="h-9 text-sm font-bold text-right bg-input border-primary/20" dir="ltr" />
               <Select value={from} onValueChange={setFrom}>
-                <SelectTrigger className="w-24 h-9 bg-input border-primary/20 text-xs"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-28 h-9 bg-input border-primary/20 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent className="bg-popover border-primary/30 max-h-64 overflow-y-auto">
                   {CURRENCIES.filter(c => c.code !== "GOLD").map(c => (
-                    <SelectItem key={c.code} value={c.code}>{c.flag} {c.code}</SelectItem>
+                    <SelectItem key={c.code} value={c.code}>
+                      <span className="mr-1">{c.flag}</span>
+                      <span className="font-bold">{c.code}</span>
+                      <span className="text-[10px] text-muted-foreground mr-1">— {c.name}</span>
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -63,10 +67,14 @@ export const FinanceToolsHeader = () => {
                 <ArrowLeftRight className="w-3.5 h-3.5" />
               </Button>
               <Select value={to} onValueChange={setTo}>
-                <SelectTrigger className="w-24 h-9 bg-input border-primary/20 text-xs"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-28 h-9 bg-input border-primary/20 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent className="bg-popover border-primary/30 max-h-64 overflow-y-auto">
                   {CURRENCIES.filter(c => c.code !== "GOLD").map(c => (
-                    <SelectItem key={c.code} value={c.code}>{c.flag} {c.code}</SelectItem>
+                    <SelectItem key={c.code} value={c.code}>
+                      <span className="mr-1">{c.flag}</span>
+                      <span className="font-bold">{c.code}</span>
+                      <span className="text-[10px] text-muted-foreground mr-1">— {c.name}</span>
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -84,10 +92,14 @@ export const FinanceToolsHeader = () => {
                 placeholder="الوزن (غ)"
                 className="h-9 text-sm font-bold text-right bg-input border-primary/20" dir="ltr" />
               <Select value={localCurrency} onValueChange={setLocalCurrency}>
-                <SelectTrigger className="w-28 h-9 bg-input border-primary/20 text-xs"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-32 h-9 bg-input border-primary/20 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent className="bg-popover border-primary/30 max-h-64 overflow-y-auto">
                   {CURRENCIES.filter(c => c.code !== "GOLD").map(c => (
-                    <SelectItem key={c.code} value={c.code}>{c.flag} {c.code}</SelectItem>
+                    <SelectItem key={c.code} value={c.code}>
+                      <span className="mr-1">{c.flag}</span>
+                      <span className="font-bold">{c.code}</span>
+                      <span className="text-[10px] text-muted-foreground mr-1">— {c.name}</span>
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
