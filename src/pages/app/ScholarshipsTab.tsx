@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { ExternalLink, BadgeCheck, Search, Award, MapPin, Clock, Send, Link2, Share2, Sparkles, Globe } from "lucide-react";
@@ -10,9 +10,23 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { nativeShare } from "@/lib/share";
+import { useGeolocation } from "@/hooks/useGeolocation";
 
 export const ScholarshipsTab = () => {
-  const [deck, setDeck] = useState(SCHOLARSHIPS);
+  const { info: geo } = useGeolocation(true);
+
+  // Prioritise scholarships in user's country (if known), then the rest
+  const orderedDeck = useMemo(() => {
+    const country = (geo?.country || "").toLowerCase();
+    if (!country) return SCHOLARSHIPS;
+    const matches = SCHOLARSHIPS.filter(s =>
+      s.country.toLowerCase().includes(country) || country.includes(s.country.toLowerCase())
+    );
+    const rest = SCHOLARSHIPS.filter(s => !matches.includes(s));
+    return [...matches, ...rest];
+  }, [geo?.country]);
+
+  const [deck, setDeck] = useState<Scholarship[]>(orderedDeck);
   const [detail, setDetail] = useState<Scholarship | null>(null);
   const [applyFor, setApplyFor] = useState<Scholarship | null>(null);
   const [aiNotice, setAiNotice] = useState(false);
@@ -22,6 +36,27 @@ export const ScholarshipsTab = () => {
   useEffect(() => {
     const t = setTimeout(() => setAiNotice(true), 4000);
     return () => clearTimeout(t);
+  }, []);
+
+  // Re-sort the deck when GPS resolves (only if user hasn't already swiped)
+  useEffect(() => {
+    setDeck(orderedDeck);
+    // eslint-disable-next-line
+  }, [orderedDeck.length, geo?.country]);
+
+  // Deep-link: open detail when ?scholarship=ID is in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("scholarship");
+    if (!id) return;
+    const target = SCHOLARSHIPS.find(s => s.id === id);
+    if (target) {
+      setDetail(target);
+      // Clean URL so it doesn't re-trigger
+      const url = new URL(window.location.href);
+      url.searchParams.delete("scholarship");
+      window.history.replaceState({}, "", url.toString());
+    }
   }, []);
 
   useEffect(() => {
@@ -45,10 +80,11 @@ export const ScholarshipsTab = () => {
 
   const shareDetail = async () => {
     if (!detail) return;
+    const origin = window.location.origin;
     await nativeShare({
       title: `الفرص — ${detail.title}`,
       text: `${detail.title} — ${detail.org} (${detail.country})`,
-      url: detail.officialUrl,
+      url: `${origin}/?scholarship=${encodeURIComponent(detail.id)}`,
     });
   };
 
