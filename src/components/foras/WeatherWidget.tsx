@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Search, MapPin, Cloud, CloudRain, Sun, CloudSnow, CloudLightning, CloudDrizzle, Wind, Droplets, RefreshCw } from "lucide-react";
 import { useSettings } from "@/contexts/SettingsContext";
 import { Input } from "@/components/ui/input";
+import { useGeolocation } from "@/hooks/useGeolocation";
 
 interface WeatherData {
   temp: number;
@@ -45,6 +46,7 @@ export const WeatherWidget = () => {
   const [data, setData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { info: geo } = useGeolocation(true);
 
   const load = async (target: string) => {
     if (!target.trim()) return;
@@ -75,6 +77,12 @@ export const WeatherWidget = () => {
   };
 
   useEffect(() => { load(city); /* eslint-disable-next-line */ }, []);
+
+  // When GPS resolves, refresh weather to user's actual location
+  useEffect(() => {
+    if (geo?.city && geo.city !== city) load(geo.city);
+    // eslint-disable-next-line
+  }, [geo?.city]);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
