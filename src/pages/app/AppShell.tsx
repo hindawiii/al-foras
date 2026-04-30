@@ -11,6 +11,7 @@ import { ApplicationsTab } from "./ApplicationsTab";
 import { ProfileTab } from "./ProfileTab";
 import { CurrencyTab } from "./CurrencyTab";
 import { useLiveNotifications } from "@/hooks/useLiveNotifications";
+import { useGeoSync } from "@/hooks/useGeoSync";
 
 const tabs = [
   { id: "scholarships" as const, label: "المنح والفرص", icon: Award, comp: ScholarshipsTab },
@@ -26,6 +27,7 @@ export const AppShell = () => {
   const [notifOpen, setNotifOpen] = useState(false);
   const Active = tabs.find(t => t.id === tab)!.comp;
   useLiveNotifications();
+  useGeoSync();
 
   return (
     <div className="min-h-screen bg-background relative">
