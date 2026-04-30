@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { ExternalLink, BadgeCheck, Search, Award, MapPin, Clock, Send, Link2, Share2, Sparkles, Globe } from "lucide-react";
+import { ExternalLink, BadgeCheck, Search, Award, MapPin, Clock, Link2, Share2, Sparkles, Globe } from "lucide-react";
 import { ScholarshipCard } from "@/components/foras/ScholarshipCard";
 import { InAppBrowser } from "@/components/foras/InAppBrowser";
 import { SCHOLARSHIPS, Scholarship, computeMatchScore } from "@/lib/mockData";
