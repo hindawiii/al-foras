@@ -115,7 +115,7 @@ export const CurrencyCalculator = () => {
                     className="h-9 text-base font-bold text-right bg-input border-gold/30" dir="ltr" />
                   <Select value={from} onValueChange={setFrom}>
                     <SelectTrigger className="w-24 h-9 bg-input border-gold/30 font-bold text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-popover border-gold/30">
+                    <SelectContent className="bg-popover border-gold/30 max-h-64 overflow-y-auto">
                       {CURRENCIES.map(c => (
                         <SelectItem key={c.code} value={c.code}>
                           <span className="font-bold text-primary mr-1">{c.code}</span>
@@ -142,7 +142,7 @@ export const CurrencyCalculator = () => {
                   </div>
                   <Select value={to} onValueChange={setTo}>
                     <SelectTrigger className="w-24 h-9 bg-input border-gold/30 font-bold text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-popover border-gold/30">
+                    <SelectContent className="bg-popover border-gold/30 max-h-64 overflow-y-auto">
                       {CURRENCIES.map(c => (
                         <SelectItem key={c.code} value={c.code}>
                           <span className="font-bold text-primary mr-1">{c.code}</span>
@@ -174,7 +174,7 @@ export const CurrencyCalculator = () => {
                   <label className="text-[10px] text-muted-foreground mb-1 block">العيار</label>
                   <Select value={karat} onValueChange={setKarat}>
                     <SelectTrigger className="h-9 bg-input border-gold/30 font-bold text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-popover border-gold/30">
+                    <SelectContent className="bg-popover border-gold/30 max-h-64 overflow-y-auto">
                       {GOLD_KARATS.map(k => (
                         <SelectItem key={k.label} value={k.label}>
                           <span className="font-bold text-primary">{k.label}</span>
