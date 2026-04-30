@@ -4,6 +4,7 @@ import { Calculator, ArrowLeftRight, Coins, Gem } from "lucide-react";
 import { CURRENCIES } from "@/lib/mockData";
 import { useLiveRates } from "@/hooks/useLiveRates";
 import { useCryptoGold, GOLD_KARATS } from "@/hooks/useCryptoGold";
+import { useSettings } from "@/contexts/SettingsContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -23,8 +24,12 @@ export const CurrencyCalculator = () => {
   const idleTimer = useRef<number | null>(null);
   const { rates, updatedAt } = useLiveRates();
   const { goldPricePerGram, updatedAt: goldUpdatedAt } = useCryptoGold();
+  const { localCurrency, setLocalCurrency } = useSettings();
   const [grams, setGrams] = useState("10");
   const [karat, setKarat] = useState("21K");
+  const [goldCur, setGoldCur] = useState<string>(localCurrency || "USD");
+  // Keep gold-tab currency in sync with global setting on first mount / changes
+  useEffect(() => { if (localCurrency) setGoldCur(localCurrency); }, [localCurrency]);
 
   const wakeUp = () => {
     setIdle(false);
@@ -42,8 +47,12 @@ export const CurrencyCalculator = () => {
   const result = ((parseFloat(amount) || 0) / fromRate * toRate).toLocaleString("en-US", { maximumFractionDigits: 4 });
 
   const karatFactor = GOLD_KARATS.find(k => k.label === karat)?.factor ?? 1;
-  const gramValue = (parseFloat(grams) || 0) * (goldPricePerGram ?? 0) * karatFactor;
-  const goldResult = gramValue.toLocaleString("en-US", { maximumFractionDigits: 2 });
+  // Live conversion: XAU → USD → selected local currency
+  const goldRate = rates[goldCur] ?? 1;
+  const goldCurMeta = CURRENCIES.find(c => c.code === goldCur);
+  const gramValueUSD = (parseFloat(grams) || 0) * (goldPricePerGram ?? 0) * karatFactor;
+  const gramValueLocal = gramValueUSD * goldRate;
+  const goldResult = gramValueLocal.toLocaleString("en-US", { maximumFractionDigits: 2 });
 
   return (
     <>
@@ -170,7 +179,7 @@ export const CurrencyCalculator = () => {
                     <Input type="number" value={grams} onChange={e => setGrams(e.target.value)}
                       className="h-9 text-base font-bold text-right bg-input border-gold/30" dir="ltr" />
                   </div>
-                  <div className="w-24">
+                  <div className="w-20">
                   <label className="text-[10px] text-muted-foreground mb-1 block">العيار</label>
                   <Select value={karat} onValueChange={setKarat}>
                     <SelectTrigger className="h-9 bg-input border-gold/30 font-bold text-xs"><SelectValue /></SelectTrigger>
@@ -183,15 +192,29 @@ export const CurrencyCalculator = () => {
                     </SelectContent>
                   </Select>
                   </div>
+                  <div className="w-24">
+                    <label className="text-[10px] text-muted-foreground mb-1 block">العملة</label>
+                    <Select value={goldCur} onValueChange={(v) => { setGoldCur(v); setLocalCurrency(v); }}>
+                      <SelectTrigger className="h-9 bg-input border-gold/30 font-bold text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent className="bg-popover border-gold/30 max-h-64 overflow-y-auto">
+                        {CURRENCIES.filter(c => c.code !== "GOLD").map(c => (
+                          <SelectItem key={c.code} value={c.code}>
+                            <span className="mr-1">{c.flag}</span>
+                            <span className="font-bold text-primary">{c.code}</span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <div className="pt-2 border-t border-border/40">
                   <p className="text-[10px] text-muted-foreground mb-0.5">القيمة التقديرية</p>
                   <p className="text-xl font-bold text-gold-gradient" dir="ltr">
-                    {goldResult} <span className="text-xs text-muted-foreground">USD</span>
+                    {goldResult} <span className="text-xs text-muted-foreground">{goldCurMeta?.symbol ?? goldCur}</span>
                   </p>
                   {goldPricePerGram && (
                     <p className="text-[10px] text-muted-foreground mt-1" dir="ltr">
-                      Base: {goldPricePerGram.toFixed(2)} USD / g (24K)
+                      Base: {goldPricePerGram.toFixed(2)} USD / g (24K) → {goldCur}
                     </p>
                   )}
                 </div>

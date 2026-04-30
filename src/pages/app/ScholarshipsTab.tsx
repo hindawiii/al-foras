@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { ExternalLink, BadgeCheck, Search, Award, MapPin, Clock, Send, Link2, Share2, Sparkles, Globe } from "lucide-react";
+import { ExternalLink, BadgeCheck, Search, Award, MapPin, Clock, Link2, Share2, Sparkles, Globe } from "lucide-react";
 import { ScholarshipCard } from "@/components/foras/ScholarshipCard";
-import { ApplyForm } from "@/components/foras/ApplyForm";
+import { InAppBrowser } from "@/components/foras/InAppBrowser";
 import { SCHOLARSHIPS, Scholarship, computeMatchScore } from "@/lib/mockData";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,8 @@ export const ScholarshipsTab = () => {
 
   const [deck, setDeck] = useState<Scholarship[]>(orderedDeck);
   const [detail, setDetail] = useState<Scholarship | null>(null);
-  const [applyFor, setApplyFor] = useState<Scholarship | null>(null);
+  const [browserUrl, setBrowserUrl] = useState<string | null>(null);
+  const [browserTitle, setBrowserTitle] = useState<string | undefined>();
   const [aiNotice, setAiNotice] = useState(false);
   const [profile, setProfile] = useState<{ location?: string; skills?: string[]; interests?: string[] }>({});
   const { user } = useAuth();
@@ -187,17 +188,17 @@ export const ScholarshipsTab = () => {
 
                 <div className="grid grid-cols-1 gap-2 pt-2">
                   <Button variant="luxe" size="lg" className="w-full"
-                    onClick={() => { setApplyFor(detail); setDetail(null); }}>
-                    <Send className="w-4 h-4 ml-2" />
-                    التقديم داخل التطبيق
+                    onClick={() => {
+                      setBrowserUrl(detail.officialUrl);
+                      setBrowserTitle(detail.title);
+                      setDetail(null);
+                    }}>
+                    <ExternalLink className="w-4 h-4 ml-2" />
+                    التقديم على الموقع الرسمي
                   </Button>
-                  <Button asChild variant="outline" size="lg"
-                    className="w-full bg-card border-gold/40 hover:bg-primary/10 hover:border-primary">
-                    <a href={detail.officialUrl} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="w-4 h-4 ml-2" />
-                      التقديم على الموقع الرسمي
-                    </a>
-                  </Button>
+                  <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
+                    سيتم فتح الموقع الرسمي للجهة المانحة داخل التطبيق لتقديم طلبك مباشرة.
+                  </p>
                 </div>
 
                 <div className="border-t border-border pt-3 mt-2">
@@ -215,7 +216,7 @@ export const ScholarshipsTab = () => {
         </SheetContent>
       </Sheet>
 
-      <ApplyForm scholarship={applyFor} open={!!applyFor} onOpenChange={(v) => !v && setApplyFor(null)} />
+      <InAppBrowser url={browserUrl} title={browserTitle} onClose={() => setBrowserUrl(null)} />
     </div>
   );
 };
