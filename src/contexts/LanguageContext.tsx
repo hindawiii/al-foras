@@ -92,14 +92,14 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
   // If country code becomes known later and user hasn't manually picked, refine.
   useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === "foras-countrycode" && !localStorage.getItem("foras-lang-manual")) {
-        const cc = e.newValue?.toUpperCase();
-        if (cc) setLangState(ARABIC_COUNTRY_CODES.has(cc) ? "ar" : "en");
-      }
+    const onCountry = (e: Event) => {
+      if (localStorage.getItem("foras-lang-manual")) return;
+      const code = (e as CustomEvent).detail?.code as string | undefined;
+      if (!code) return;
+      setLangState(ARABIC_COUNTRY_CODES.has(code.toUpperCase()) ? "ar" : "en");
     };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    window.addEventListener("foras:countrychange", onCountry as EventListener);
+    return () => window.removeEventListener("foras:countrychange", onCountry as EventListener);
   }, []);
 
   const setLang = useCallback((l: Lang) => {
