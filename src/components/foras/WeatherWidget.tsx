@@ -4,6 +4,7 @@ import { Search, MapPin, Cloud, CloudRain, Sun, CloudSnow, CloudLightning, Cloud
 import { useSettings } from "@/contexts/SettingsContext";
 import { Input } from "@/components/ui/input";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { ENV } from "@/lib/env";
 
 interface WeatherData {
   temp: number;
@@ -52,25 +53,13 @@ export const WeatherWidget = () => {
     if (!target.trim()) return;
     try {
       setLoading(true); setError(null);
-      const geo = await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(target)}&count=1&language=ar&format=json`
-      ).then(r => r.json());
-      const place = geo?.results?.[0];
-      if (!place) { setError("لم يتم العثور على المدينة"); setLoading(false); return; }
-      const w = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m`
-      ).then(r => r.json());
-      const c = w?.current;
-      if (!c) { setError("تعذر تحديث الطقس"); setLoading(false); return; }
-      setData({
-        temp: Math.round(c.temperature_2m),
-        code: c.weather_code,
-        windspeed: Math.round(c.wind_speed_10m),
-        humidity: c.relative_humidity_2m,
-        city: place.name,
-        country: place.country,
-      });
-      setCity(place.name);
+      const result = ENV.OPENWEATHER_API_KEY
+        ? await loadFromOpenWeather(target, ENV.OPENWEATHER_API_KEY).catch(() => null)
+        : null;
+      const finalResult = result ?? await loadFromOpenMeteo(target);
+      if (!finalResult) { setError("لم يتم العثور على المدينة"); setLoading(false); return; }
+      setData(finalResult);
+      setCity(finalResult.city);
     } catch {
       setError("تعذر تحديث الطقس");
     } finally { setLoading(false); }
