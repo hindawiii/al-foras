@@ -59,6 +59,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     setCountryCodeState(code);
     if (code) localStorage.setItem("foras-countrycode", code);
     else localStorage.removeItem("foras-countrycode");
+    window.dispatchEvent(new CustomEvent("foras:countrychange", { detail: { code } }));
   };
 
   return (

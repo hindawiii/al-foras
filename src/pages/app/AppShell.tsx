@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Award, Newspaper, Bookmark, User, Settings as SettingsIcon, Bell, Coins } from "lucide-react";
+import { Award, Newspaper, Bookmark, User, Settings as SettingsIcon, Bell, Coins, Languages } from "lucide-react";
 import { BrandMark } from "@/components/foras/Logo";
 import { CurrencyCalculator } from "@/components/foras/CurrencyCalculator";
 import { SettingsSheet } from "@/components/foras/SettingsSheet";
@@ -12,6 +12,7 @@ import { ProfileTab } from "./ProfileTab";
 import { CurrencyTab } from "./CurrencyTab";
 import { useLiveNotifications } from "@/hooks/useLiveNotifications";
 import { useGeoSync } from "@/hooks/useGeoSync";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const tabs = [
   { id: "scholarships" as const, label: "المنح والفرص", icon: Award, comp: ScholarshipsTab },
@@ -28,6 +29,16 @@ export const AppShell = () => {
   const Active = tabs.find(t => t.id === tab)!.comp;
   useLiveNotifications();
   useGeoSync();
+  const { lang, toggleLang } = useLanguage();
+
+  useEffect(() => {
+    const onNav = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { tab?: typeof tabs[number]["id"] };
+      if (detail?.tab) setTab(detail.tab);
+    };
+    window.addEventListener("foras:navigate", onNav as EventListener);
+    return () => window.removeEventListener("foras:navigate", onNav as EventListener);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -36,6 +47,14 @@ export const AppShell = () => {
         <div className="max-w-2xl mx-auto px-5 py-4 flex justify-between items-center">
           <BrandMark />
           <div className="flex items-center gap-2">
+            <button onClick={toggleLang}
+              className="h-11 px-3 rounded-xl bg-card border border-primary/20 hover:border-primary hover:bg-primary/10 transition-all flex items-center gap-1.5"
+              aria-label="Toggle language">
+              <Languages className="w-4 h-4 text-primary" />
+              <span className="text-xs font-bold text-primary">
+                {lang === "ar" ? "EN" : "ع"}
+              </span>
+            </button>
             <button onClick={() => setNotifOpen(true)}
               className="relative w-11 h-11 rounded-xl bg-card border border-primary/20 hover:border-primary hover:bg-primary/10 transition-all flex items-center justify-center"
               aria-label="الإشعارات">
