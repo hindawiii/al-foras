@@ -41,6 +41,60 @@ const WMO: Record<number, { ar: string; bg: string; Icon: typeof Sun }> = {
 
 const desc = (code: number) => WMO[code] ?? { ar: "—", bg: "from-slate-500/20 to-background", Icon: Cloud };
 
+// Map OpenWeather "main" / id → WMO-like code so existing UI still works.
+const owToWmo = (id: number): number => {
+  if (id >= 200 && id < 300) return 95;        // thunderstorm
+  if (id >= 300 && id < 400) return 51;        // drizzle
+  if (id >= 500 && id < 504) return 61;
+  if (id === 511) return 65;
+  if (id >= 520 && id < 600) return 80;
+  if (id >= 600 && id < 700) return 71;
+  if (id >= 700 && id < 800) return 45;        // atmosphere/fog
+  if (id === 800) return 0;
+  if (id === 801) return 1;
+  if (id === 802) return 2;
+  if (id === 803 || id === 804) return 3;
+  return 3;
+};
+
+async function loadFromOpenMeteo(target: string): Promise<WeatherData | null> {
+  const geo = await fetch(
+    `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(target)}&count=1&language=ar&format=json`
+  ).then(r => r.json());
+  const place = geo?.results?.[0];
+  if (!place) return null;
+  const w = await fetch(
+    `https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m`
+  ).then(r => r.json());
+  const c = w?.current;
+  if (!c) return null;
+  return {
+    temp: Math.round(c.temperature_2m),
+    code: c.weather_code,
+    windspeed: Math.round(c.wind_speed_10m),
+    humidity: c.relative_humidity_2m,
+    city: place.name,
+    country: place.country,
+  };
+}
+
+async function loadFromOpenWeather(target: string, key: string): Promise<WeatherData | null> {
+  const res = await fetch(
+    `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(target)}&appid=${key}&units=metric&lang=ar`
+  );
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (!data || data.cod !== 200) return null;
+  return {
+    temp: Math.round(data.main?.temp ?? 0),
+    code: owToWmo(data.weather?.[0]?.id ?? 800),
+    windspeed: Math.round((data.wind?.speed ?? 0) * 3.6),
+    humidity: data.main?.humidity,
+    city: data.name ?? target,
+    country: data.sys?.country,
+  };
+}
+
 export const WeatherWidget = () => {
   const { city, setCity } = useSettings();
   const [query, setQuery] = useState("");
