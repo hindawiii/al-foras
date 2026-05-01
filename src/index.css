@@ -81,9 +81,7 @@
     @apply border-border;
   }
 
-  html {
-    direction: rtl;
-  }
+  /* Direction is controlled dynamically by LanguageContext via <html dir="..."> */
 
   body {
     @apply bg-background text-foreground font-arabic antialiased;
