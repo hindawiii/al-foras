@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const CurrencyCalculator = () => {
   const [open, setOpen] = useState(false);
@@ -30,6 +31,8 @@ export const CurrencyCalculator = () => {
   const [goldCur, setGoldCur] = useState<string>(localCurrency || "USD");
   // Keep gold-tab currency in sync with global setting on first mount / changes
   useEffect(() => { if (localCurrency) setGoldCur(localCurrency); }, [localCurrency]);
+  const { t, lang, dir } = useLanguage();
+  const isRtl = dir === "rtl";
 
   const wakeUp = () => {
     setIdle(false);
@@ -89,8 +92,8 @@ export const CurrencyCalculator = () => {
                 <Calculator className="w-4 h-4 text-primary-foreground" />
               </div>
               <div className="pr-1 pl-2">
-                <p className="text-[9px] text-primary-foreground/70 leading-none mb-0.5">حاسبة</p>
-                <p className="text-[11px] font-bold text-primary-foreground leading-none whitespace-nowrap">العملات والذهب الحية</p>
+                <p className="text-[9px] text-primary-foreground/70 leading-none mb-0.5">{t("calc")}</p>
+                <p className="text-[11px] font-bold text-primary-foreground leading-none whitespace-nowrap">{t("liveGoldCurrency")}</p>
               </div>
             </div>
           </div>
@@ -100,28 +103,28 @@ export const CurrencyCalculator = () => {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="bottom" className="bg-card border-gold/30 rounded-t-3xl max-h-[85vh] overflow-y-auto p-4">
           <SheetHeader className="pb-1">
-            <SheetTitle className="text-gold-gradient font-display text-lg text-right">
-              حاسبة العملات والذهب الحية
+            <SheetTitle className={`text-gold-gradient font-display text-lg ${isRtl ? "text-right" : "text-left"}`}>
+              {t("liveGoldCurrency")}
             </SheetTitle>
           </SheetHeader>
 
-          <Tabs defaultValue="currency" className="pt-3" dir="rtl">
+          <Tabs defaultValue="currency" className="pt-3" dir={dir}>
             <TabsList className="grid grid-cols-2 w-full bg-input border border-gold/30 h-9">
               <TabsTrigger value="currency" className="data-[state=active]:bg-gold-gradient data-[state=active]:text-primary-foreground gap-1.5 text-xs h-7">
-                <Coins className="w-3.5 h-3.5" /> العملات
+                <Coins className="w-3.5 h-3.5" /> {t("currency")}
               </TabsTrigger>
               <TabsTrigger value="gold" className="data-[state=active]:bg-gold-gradient data-[state=active]:text-primary-foreground gap-1.5 text-xs h-7">
-                <Gem className="w-3.5 h-3.5" /> الذهب
+                <Gem className="w-3.5 h-3.5" /> {t("gold")}
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="currency" className="space-y-2 pt-3">
             <div className="bg-card-gradient border-gold rounded-xl p-3 space-y-2">
               <div>
-                <label className="text-[10px] text-muted-foreground mb-1 block">من</label>
+                <label className="text-[10px] text-muted-foreground mb-1 block">{t("from")}</label>
                 <div className="flex gap-1.5">
                   <Input type="number" value={amount} onChange={e => setAmount(e.target.value)}
-                    className="h-9 text-base font-bold text-right bg-input border-gold/30" dir="ltr" />
+                    className={`h-9 text-base font-bold ${isRtl ? "text-right" : "text-left"} bg-input border-gold/30`} dir="ltr" />
                   <Select value={from} onValueChange={setFrom}>
                     <SelectTrigger className="w-24 h-9 bg-input border-gold/30 font-bold text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent className="bg-popover border-gold/30 max-h-64 overflow-y-auto">
@@ -144,7 +147,7 @@ export const CurrencyCalculator = () => {
               </div>
 
               <div>
-                <label className="text-[10px] text-muted-foreground mb-1 block">إلى</label>
+                <label className="text-[10px] text-muted-foreground mb-1 block">{t("to")}</label>
                 <div className="flex gap-1.5">
                   <div className="flex-1 h-9 px-2 rounded-md bg-input border border-primary/40 flex items-center justify-end">
                     <span className="text-base font-bold text-gold-gradient" dir="ltr">{result}</span>
@@ -166,8 +169,8 @@ export const CurrencyCalculator = () => {
 
             <div className="text-[10px] text-muted-foreground text-center">
               {updatedAt
-                ? `أسعار حية — آخر تحديث ${updatedAt.toLocaleTimeString("ar-EG")}`
-                : "جارٍ جلب أحدث الأسعار..."}
+                ? `${t("liveRatesAt")} ${updatedAt.toLocaleTimeString(lang === "ar" ? "ar-EG" : "en-US")}`
+                : t("fetchingRates")}
             </div>
             </TabsContent>
 
@@ -175,12 +178,12 @@ export const CurrencyCalculator = () => {
               <div className="bg-card-gradient border-gold rounded-xl p-3 space-y-2">
                 <div className="flex gap-1.5">
                   <div className="flex-1">
-                    <label className="text-[10px] text-muted-foreground mb-1 block">الوزن (غ)</label>
+                    <label className="text-[10px] text-muted-foreground mb-1 block">{t("weight")}</label>
                     <Input type="number" value={grams} onChange={e => setGrams(e.target.value)}
-                      className="h-9 text-base font-bold text-right bg-input border-gold/30" dir="ltr" />
+                      className={`h-9 text-base font-bold ${isRtl ? "text-right" : "text-left"} bg-input border-gold/30`} dir="ltr" />
                   </div>
                   <div className="w-20">
-                  <label className="text-[10px] text-muted-foreground mb-1 block">العيار</label>
+                  <label className="text-[10px] text-muted-foreground mb-1 block">{t("karat")}</label>
                   <Select value={karat} onValueChange={setKarat}>
                     <SelectTrigger className="h-9 bg-input border-gold/30 font-bold text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent className="bg-popover border-gold/30 max-h-64 overflow-y-auto">
@@ -193,7 +196,7 @@ export const CurrencyCalculator = () => {
                   </Select>
                   </div>
                   <div className="w-24">
-                    <label className="text-[10px] text-muted-foreground mb-1 block">العملة</label>
+                    <label className="text-[10px] text-muted-foreground mb-1 block">{t("currency")}</label>
                     <Select value={goldCur} onValueChange={(v) => { setGoldCur(v); setLocalCurrency(v); }}>
                       <SelectTrigger className="h-9 bg-input border-gold/30 font-bold text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent className="bg-popover border-gold/30 max-h-64 overflow-y-auto">
@@ -208,7 +211,7 @@ export const CurrencyCalculator = () => {
                   </div>
                 </div>
                 <div className="pt-2 border-t border-border/40">
-                  <p className="text-[10px] text-muted-foreground mb-0.5">القيمة التقديرية</p>
+                  <p className="text-[10px] text-muted-foreground mb-0.5">{t("estValue")}</p>
                   <p className="text-xl font-bold text-gold-gradient" dir="ltr">
                     {goldResult} <span className="text-xs text-muted-foreground">{goldCurMeta?.symbol ?? goldCur}</span>
                   </p>
@@ -221,8 +224,8 @@ export const CurrencyCalculator = () => {
               </div>
               <div className="text-[10px] text-muted-foreground text-center">
                 {goldUpdatedAt
-                  ? `سعر الذهب الحي — آخر تحديث ${goldUpdatedAt.toLocaleTimeString("ar-EG")}`
-                  : "جارٍ جلب سعر الذهب..."}
+                  ? `${t("liveGoldAt")} ${goldUpdatedAt.toLocaleTimeString(lang === "ar" ? "ar-EG" : "en-US")}`
+                  : t("fetchingGold")}
               </div>
             </TabsContent>
           </Tabs>
