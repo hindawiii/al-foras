@@ -13,6 +13,12 @@ interface SettingsCtx {
   setCountryCode: (code: string | null) => void;
   /** True if the user has manually picked a currency (don't auto-override). */
   currencyManuallySet: boolean;
+  /** Privacy: allow location sharing (GPS + weather). Default true. */
+  locationSharingEnabled: boolean;
+  setLocationSharingEnabled: (v: boolean) => void;
+  /** Privacy: hide profile details from other app users. */
+  hideProfile: boolean;
+  setHideProfile: (v: boolean) => void;
 }
 
 const Ctx = createContext<SettingsCtx>({
@@ -22,6 +28,8 @@ const Ctx = createContext<SettingsCtx>({
   city: "الرياض", setCity: () => {},
   countryCode: null, setCountryCode: () => {},
   currencyManuallySet: false,
+  locationSharingEnabled: true, setLocationSharingEnabled: () => {},
+  hideProfile: false, setHideProfile: () => {},
 });
 
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
@@ -35,6 +43,22 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   const [currencyManuallySet, setCurrencyManuallySet] = useState(
     () => localStorage.getItem("foras-currency-manual") === "true"
   );
+  const [locationSharingEnabled, setLocationSharingEnabledState] = useState<boolean>(
+    () => localStorage.getItem("foras-location-sharing") !== "false"
+  );
+  const [hideProfile, setHideProfileState] = useState<boolean>(
+    () => localStorage.getItem("foras-hide-profile") === "true"
+  );
+
+  const setLocationSharingEnabled = (v: boolean) => {
+    setLocationSharingEnabledState(v);
+    localStorage.setItem("foras-location-sharing", String(v));
+    window.dispatchEvent(new CustomEvent("foras:location-sharing", { detail: { enabled: v } }));
+  };
+  const setHideProfile = (v: boolean) => {
+    setHideProfileState(v);
+    localStorage.setItem("foras-hide-profile", String(v));
+  };
 
   useEffect(() => {
     document.documentElement.classList.toggle("light", !darkMode);
@@ -72,6 +96,8 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
       city, setCity,
       countryCode, setCountryCode,
       currencyManuallySet,
+      locationSharingEnabled, setLocationSharingEnabled,
+      hideProfile, setHideProfile,
     }}>{children}</Ctx.Provider>
   );
 };
