@@ -7,20 +7,24 @@ import { WeatherWidget } from "@/components/foras/WeatherWidget";
 import { useNewsFeed, FeedItem } from "@/hooks/useNewsFeed";
 import { findCountryByCode } from "@/lib/countries";
 import { InAppBrowser } from "@/components/foras/InAppBrowser";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-const cats = [
-  { id: "all"    as const, label: "الكل",    icon: Newspaper },
-  { id: "local"  as const, label: "محلي",    icon: MapPin },
-  { id: "arab"   as const, label: "عربي",    icon: Newspaper },
-  { id: "global" as const, label: "عالمي",   icon: Globe2 },
+const catsDef = [
+  { id: "all"    as const, key: "catAll",    icon: Newspaper },
+  { id: "local"  as const, key: "catLocal",  icon: MapPin },
+  { id: "arab"   as const, key: "catArab",   icon: Newspaper },
+  { id: "global" as const, key: "catGlobal", icon: Globe2 },
 ];
 
 export const NewsTab = () => {
-  const [cat, setCat] = useState<typeof cats[number]["id"]>("all");
+  const [cat, setCat] = useState<typeof catsDef[number]["id"]>("all");
   const { textOnly, toggleTextOnly, countryCode } = useSettings();
   const { items, loading, error, updatedAt } = useNewsFeed();
   const [browserUrl, setBrowserUrl] = useState<string | null>(null);
   const [browserTitle, setBrowserTitle] = useState<string | undefined>();
+  const { t, lang, dir } = useLanguage();
+  const isRtl = dir === "rtl";
+  const alignClass = isRtl ? "text-right" : "text-left";
 
   const country = findCountryByCode(countryCode);
 
@@ -49,13 +53,13 @@ export const NewsTab = () => {
       <div className="flex items-center justify-between glass rounded-2xl p-3">
         <div className="flex items-center gap-2">
           <FileText className="w-4 h-4 text-primary" />
-          <span className="text-sm">وضع توفير البيانات (نص فقط)</span>
+          <span className="text-sm">{t("dataSaver")}</span>
         </div>
         <Switch checked={textOnly} onCheckedChange={toggleTextOnly} />
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
-        {cats.map(c => {
+        {catsDef.map(c => {
           const Icon = c.icon;
           const active = cat === c.id;
           return (
@@ -64,7 +68,7 @@ export const NewsTab = () => {
                 active ? "bg-gold-gradient text-primary-foreground shadow-gold" : "bg-card border border-border text-muted-foreground hover:border-primary/40"
               }`}>
               <Icon className="w-3.5 h-3.5" />
-              {c.label}
+              {t(c.key)}
               {c.id === "local" && country && (
                 <span className="text-[10px] opacity-80">{country.flag}</span>
               )}
@@ -76,9 +80,9 @@ export const NewsTab = () => {
       <div className="flex items-center justify-between text-[10px] text-muted-foreground px-1">
         <span className="flex items-center gap-1">
           {loading && <RefreshCw className="w-3 h-3 animate-spin" />}
-          {updatedAt ? `آخر تحديث ${updatedAt.toLocaleTimeString("ar-EG")}` : "جارٍ التحميل..."}
+          {updatedAt ? `${t("lastUpdated")} ${updatedAt.toLocaleTimeString(lang === "ar" ? "ar-EG" : "en-US")}` : t("loadingShort")}
         </span>
-        <span>{filtered.length} خبر</span>
+        <span>{filtered.length} {t("newsCount")}</span>
       </div>
 
       {error && filtered.length === 0 && (
@@ -89,7 +93,7 @@ export const NewsTab = () => {
 
       <div className="grid grid-cols-2 gap-3 pb-32">
         {filtered.slice(0, 60).map((item, i) => (
-          <NewsCard key={item.id} item={item} index={i} textOnly={textOnly} onOpen={() => open(item)} />
+          <NewsCard key={item.id} item={item} index={i} textOnly={textOnly} onOpen={() => open(item)} alignClass={alignClass} isRtl={isRtl} openLabel={t("openSource")} />
         ))}
       </div>
 
@@ -99,8 +103,8 @@ export const NewsTab = () => {
 };
 
 const NewsCard = ({
-  item, index, textOnly, onOpen,
-}: { item: FeedItem; index: number; textOnly: boolean; onOpen: () => void }) => (
+  item, index, textOnly, onOpen, alignClass, isRtl, openLabel,
+}: { item: FeedItem; index: number; textOnly: boolean; onOpen: () => void; alignClass: string; isRtl: boolean; openLabel: string }) => (
   <motion.article
     initial={{ opacity: 0, y: 15 }}
     animate={{ opacity: 1, y: 0 }}
@@ -113,13 +117,13 @@ const NewsCard = ({
         <img src={item.image} alt={item.title} loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
-        <span className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm text-[10px] text-primary font-bold px-2 py-0.5 rounded-full border border-primary/30">
+        <span className={`absolute top-2 ${isRtl ? "right-2" : "left-2"} bg-background/80 backdrop-blur-sm text-[10px] text-primary font-bold px-2 py-0.5 rounded-full border border-primary/30`}>
           {item.source}
         </span>
       </div>
     )}
-    <div className="p-3 flex flex-col flex-1 text-right">
-      <div className="flex items-center justify-end gap-2 text-[10px] text-muted-foreground mb-1.5">
+    <div className={`p-3 flex flex-col flex-1 ${alignClass}`}>
+      <div className={`flex items-center ${isRtl ? "justify-end" : "justify-start"} gap-2 text-[10px] text-muted-foreground mb-1.5`}>
         {(textOnly || !item.image) && <span className="text-primary font-medium">{item.source}</span>}
         <span>{item.time}</span>
       </div>
@@ -127,9 +131,9 @@ const NewsCard = ({
       {!textOnly && item.summary && (
         <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-3">{item.summary}</p>
       )}
-      <div className="mt-2 flex items-center justify-end gap-1 text-[10px] text-primary">
+      <div className={`mt-2 flex items-center ${isRtl ? "justify-end" : "justify-start"} gap-1 text-[10px] text-primary`}>
         <ExternalLink className="w-3 h-3" />
-        <span>افتح المصدر</span>
+        <span>{openLabel}</span>
       </div>
     </div>
   </motion.article>
