@@ -26,6 +26,11 @@ export const useGeolocation = (auto = true) => {
   const [error, setError] = useState<string | null>(null);
 
   const request = () => {
+    // Respect user privacy: skip if location sharing has been disabled
+    if (typeof window !== "undefined" && localStorage.getItem("foras-location-sharing") === "false") {
+      setError("location-disabled");
+      return;
+    }
     if (typeof navigator === "undefined" || !navigator.geolocation) {
       setError("الموقع غير مدعوم");
       return;
@@ -65,7 +70,24 @@ export const useGeolocation = (auto = true) => {
   useEffect(() => {
     if (!auto) return;
     if (info?.city) return; // already cached
+    if (typeof window !== "undefined" && localStorage.getItem("foras-location-sharing") === "false") return;
     request();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Clear cached info if user disables location sharing
+  useEffect(() => {
+    const onChange = (e: Event) => {
+      const enabled = (e as CustomEvent).detail?.enabled;
+      if (enabled === false) {
+        setInfo(null);
+        localStorage.removeItem(STORAGE_KEY);
+      } else if (enabled === true && !info?.city) {
+        request();
+      }
+    };
+    window.addEventListener("foras:location-sharing", onChange as EventListener);
+    return () => window.removeEventListener("foras:location-sharing", onChange as EventListener);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
