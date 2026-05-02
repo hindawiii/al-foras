@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { INTEREST_OPTIONS } from "@/lib/mockData";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface ProfileState {
   full_name: string; bio: string; education: string; location: string;
@@ -19,6 +21,10 @@ const empty: ProfileState = { full_name: "", bio: "", education: "", location: "
 
 export const ProfileTab = () => {
   const { user } = useAuth();
+  const { t, dir } = useLanguage();
+  const { hideProfile } = useSettings();
+  const isRtl = dir === "rtl";
+  const alignClass = isRtl ? "text-right" : "text-left";
   const [profile, setProfile] = useState<ProfileState>(empty);
   const [draft, setDraft] = useState<ProfileState>(empty);
   const [editing, setEditing] = useState(false);
@@ -59,10 +65,10 @@ export const ProfileTab = () => {
     setSaving(true);
     const { error } = await supabase.from("profiles").update(draft).eq("id", user.id);
     setSaving(false);
-    if (error) { toast.error("تعذر الحفظ"); return; }
+    if (error) { toast.error(t("saveFailed")); return; }
     setProfile(draft);
     setEditing(false);
-    toast.success("تم حفظ ملفك الشخصي");
+    toast.success(t("saved2"));
   };
 
   const addSkill = () => {
@@ -80,7 +86,7 @@ export const ProfileTab = () => {
     }));
   };
 
-  if (loading) return <div className="text-center text-muted-foreground py-20">جاري التحميل...</div>;
+  if (loading) return <div className="text-center text-muted-foreground py-20">{t("loading")}</div>;
 
   // ===== ID Card View =====
   if (!editing) {
@@ -92,10 +98,10 @@ export const ProfileTab = () => {
           <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary-glow/10 rounded-full blur-3xl" />
 
           <div className="relative flex items-center justify-between mb-4">
-            <span className="text-[10px] tracking-widest text-primary font-bold">FORAS · ID CARD</span>
+            <span className="text-[10px] tracking-widest text-primary font-bold">{t("idCard")}</span>
             <button onClick={startEdit}
               className="flex items-center gap-1.5 text-xs bg-primary/10 border border-primary/30 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-full">
-              <Edit3 className="w-3 h-3" /> تعديل
+              <Edit3 className="w-3 h-3" /> {t("edit")}
             </button>
           </div>
 
@@ -105,12 +111,12 @@ export const ProfileTab = () => {
             </div>
             <div className="flex-1 min-w-0">
               <h2 className="font-display text-xl text-gold-gradient truncate">
-                {profile.full_name || "اسمك الكامل"}
+                {hideProfile ? "•••••" : (profile.full_name || t("yourFullName"))}
               </h2>
               <p className="text-xs text-muted-foreground truncate flex items-center gap-1 mt-0.5" dir="ltr">
-                <Mail className="w-3 h-3" /> {user?.email}
+                <Mail className="w-3 h-3" /> {hideProfile ? "•••••@•••••" : user?.email}
               </p>
-              {profile.location && (
+              {profile.location && !hideProfile && (
                 <p className="text-xs text-foreground flex items-center gap-1 mt-1">
                   <MapPin className="w-3 h-3 text-primary" /> {profile.location}
                 </p>
@@ -120,7 +126,7 @@ export const ProfileTab = () => {
 
           <div className="relative bg-background/40 border border-border rounded-xl p-3 mb-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-muted-foreground">اكتمال الملف الشخصي</span>
+              <span className="text-xs text-muted-foreground">{t("profileCompletion")}</span>
               <span className="text-sm font-bold text-primary">{completion}%</span>
             </div>
             <div className="h-2 bg-background rounded-full overflow-hidden">
@@ -130,31 +136,31 @@ export const ProfileTab = () => {
             </div>
             {completion < 100 && (
               <p className="text-[10px] text-muted-foreground mt-2">
-                أكمل بياناتك للحصول على مطابقات أدق للمنح والفرص.
+                {t("completeProfileHint")}
               </p>
             )}
           </div>
 
-          {profile.bio && (
+          {profile.bio && !hideProfile && (
             <div className="relative bg-background/40 border border-border rounded-xl p-3 mb-3">
-              <p className="text-[10px] text-primary mb-1 font-bold">نبذة</p>
+              <p className="text-[10px] text-primary mb-1 font-bold">{t("bio")}</p>
               <p className="text-sm text-foreground leading-relaxed">{profile.bio}</p>
             </div>
           )}
 
-          {profile.education && (
+          {profile.education && !hideProfile && (
             <div className="relative bg-background/40 border border-border rounded-xl p-3 mb-3">
               <p className="text-[10px] text-primary mb-1 font-bold flex items-center gap-1">
-                <GraduationCap className="w-3 h-3" /> التعليم
+                <GraduationCap className="w-3 h-3" /> {t("education")}
               </p>
               <p className="text-sm text-foreground leading-relaxed">{profile.education}</p>
             </div>
           )}
 
-          {profile.interests.length > 0 && (
+          {profile.interests.length > 0 && !hideProfile && (
             <div className="relative bg-background/40 border border-border rounded-xl p-3 mb-3">
               <p className="text-[10px] text-primary mb-2 font-bold flex items-center gap-1">
-                <Sparkles className="w-3 h-3" /> الاهتمامات الأساسية
+                <Sparkles className="w-3 h-3" /> {t("interests")}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {profile.interests.map(i => (
@@ -166,9 +172,9 @@ export const ProfileTab = () => {
             </div>
           )}
 
-          {profile.skills.length > 0 && (
+          {profile.skills.length > 0 && !hideProfile && (
             <div className="relative bg-background/40 border border-border rounded-xl p-3">
-              <p className="text-[10px] text-primary mb-2 font-bold">المهارات</p>
+              <p className="text-[10px] text-primary mb-2 font-bold">{t("skills")}</p>
               <div className="flex flex-wrap gap-1.5">
                 {profile.skills.map(s => (
                   <span key={s} className="text-xs bg-primary/10 border border-primary/30 text-primary px-2.5 py-1 rounded-full">
@@ -188,37 +194,37 @@ export const ProfileTab = () => {
     <div className="space-y-5 pb-24">
       <div className="bg-card-gradient border-gold rounded-3xl p-5 flex items-center justify-between">
         <div>
-          <h2 className="font-display text-xl text-gold-gradient">تعديل الملف الشخصي</h2>
-          <p className="text-xs text-muted-foreground mt-1">حدّث بياناتك للحصول على فرص أنسب</p>
+          <h2 className="font-display text-xl text-gold-gradient">{t("editProfile")}</h2>
+          <p className="text-xs text-muted-foreground mt-1">{t("editProfileDesc")}</p>
         </div>
-        <Button variant="ghostGold" size="sm" onClick={cancelEdit}>إلغاء</Button>
+        <Button variant="ghostGold" size="sm" onClick={cancelEdit}>{t("cancel")}</Button>
       </div>
 
-      <Section title="المعلومات الشخصية">
-        <Field icon={UserIcon} label="الاسم الكامل">
+      <Section title={t("personalInfo")} alignClass={alignClass}>
+        <Field icon={UserIcon} label={t("fullName")}>
           <Input value={draft.full_name} onChange={e => setDraft({ ...draft, full_name: e.target.value })}
-            className="bg-input border-gold/30 text-right" placeholder="اكتب اسمك" />
+            className={`bg-input border-gold/30 ${alignClass}`} placeholder={t("yourNameHolder")} />
         </Field>
-        <Field icon={MapPin} label="الموقع">
+        <Field icon={MapPin} label={t("location")}>
           <Input value={draft.location} onChange={e => setDraft({ ...draft, location: e.target.value })}
-            className="bg-input border-gold/30 text-right" placeholder="المدينة، الدولة" />
+            className={`bg-input border-gold/30 ${alignClass}`} placeholder={t("locationHolder")} />
         </Field>
-        <Field icon={Mail} label="نبذة">
+        <Field icon={Mail} label={t("bio")}>
           <Textarea value={draft.bio} onChange={e => setDraft({ ...draft, bio: e.target.value })}
-            className="bg-input border-gold/30 text-right min-h-24" placeholder="عرّف عن نفسك..." />
+            className={`bg-input border-gold/30 ${alignClass} min-h-24`} placeholder={t("bioHolder")} />
         </Field>
       </Section>
 
-      <Section title="التعليم">
-        <Field icon={GraduationCap} label="المؤهل التعليمي">
+      <Section title={t("education")} alignClass={alignClass}>
+        <Field icon={GraduationCap} label={t("eduLabel")}>
           <Textarea value={draft.education} onChange={e => setDraft({ ...draft, education: e.target.value })}
-            className="bg-input border-gold/30 text-right min-h-20"
-            placeholder="مثال: بكالوريوس هندسة حاسوب، جامعة الملك سعود، 2024" />
+            className={`bg-input border-gold/30 ${alignClass} min-h-20`}
+            placeholder={t("eduHolder")} />
         </Field>
       </Section>
 
-      <Section title="الاهتمامات الأساسية">
-        <p className="text-xs text-muted-foreground -mt-2">تُستخدم لمطابقتك بالمنح والفرص الأنسب لك.</p>
+      <Section title={t("interests")} alignClass={alignClass}>
+        <p className="text-xs text-muted-foreground -mt-2">{t("interestsHint")}</p>
         <div className="flex flex-wrap gap-2">
           {INTEREST_OPTIONS.map(i => {
             const active = draft.interests.includes(i);
@@ -237,11 +243,11 @@ export const ProfileTab = () => {
         </div>
       </Section>
 
-      <Section title="المهارات">
+      <Section title={t("skills")} alignClass={alignClass}>
         <div className="flex gap-2">
           <Input value={skillInput} onChange={e => setSkillInput(e.target.value)}
             onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addSkill())}
-            className="bg-input border-gold/30 text-right" placeholder="أضف مهارة..." />
+            className={`bg-input border-gold/30 ${alignClass}`} placeholder={t("addSkill")} />
           <Button type="button" variant="gold" size="icon" onClick={addSkill}>
             <Plus className="w-4 h-4" />
           </Button>
@@ -255,21 +261,21 @@ export const ProfileTab = () => {
               </button>
             </span>
           ))}
-          {draft.skills.length === 0 && <p className="text-sm text-muted-foreground">لم تُضِف مهارات بعد</p>}
+          {draft.skills.length === 0 && <p className="text-sm text-muted-foreground">{t("noSkills")}</p>}
         </div>
       </Section>
 
       <Button variant="luxe" size="lg" className="w-full" onClick={save} disabled={saving}>
-        <Save className="w-4 h-4 ml-2" />
-        {saving ? "جاري الحفظ..." : "حفظ التغييرات"}
+        <Save className={`w-4 h-4 ${isRtl ? "ml-2" : "mr-2"}`} />
+        {saving ? t("saving") : t("save")}
       </Button>
     </div>
   );
 };
 
-const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+const Section = ({ title, children, alignClass }: { title: string; children: React.ReactNode; alignClass: string }) => (
   <div className="bg-card-gradient border border-border rounded-2xl p-5 space-y-4">
-    <h3 className="font-display text-lg text-gold-gradient text-right">{title}</h3>
+    <h3 className={`font-display text-lg text-gold-gradient ${alignClass}`}>{title}</h3>
     {children}
   </div>
 );
