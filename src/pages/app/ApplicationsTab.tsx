@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Saved {
   id: string; scholarship_id: string; scholarship_title: string;
@@ -15,6 +16,8 @@ export const ApplicationsTab = () => {
   const { user } = useAuth();
   const [items, setItems] = useState<Saved[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t, lang, dir } = useLanguage();
+  const isRtl = dir === "rtl";
 
   const load = async () => {
     if (!user) return;
@@ -28,17 +31,17 @@ export const ApplicationsTab = () => {
 
   const setStatus = async (id: string, status: string) => {
     await supabase.from("saved_scholarships").update({ status }).eq("id", id);
-    toast.success(status === "applied" ? "تم وضع علامة كمتقدّم" : "تم التحديث");
+    toast.success(status === "applied" ? t("markedApplied") : t("updated"));
     load();
   };
 
   const remove = async (id: string) => {
     await supabase.from("saved_scholarships").delete().eq("id", id);
-    toast.success("تمت الإزالة");
+    toast.success(t("removed"));
     load();
   };
 
-  if (loading) return <div className="text-center text-muted-foreground py-20">جاري التحميل...</div>;
+  if (loading) return <div className="text-center text-muted-foreground py-20">{t("loading")}</div>;
 
   if (items.length === 0) {
     return (
@@ -46,8 +49,8 @@ export const ApplicationsTab = () => {
         <div className="w-20 h-20 mx-auto mb-5 rounded-3xl bg-card-gradient border-gold flex items-center justify-center">
           <Bookmark className="w-10 h-10 text-primary" strokeWidth={1.3} />
         </div>
-        <h3 className="font-display text-xl text-gold-gradient mb-2">لا توجد طلبات بعد</h3>
-        <p className="text-muted-foreground text-sm">ابدأ بحفظ المنح من قسم "المنح والفرص"</p>
+        <h3 className="font-display text-xl text-gold-gradient mb-2">{t("noApps")}</h3>
+        <p className="text-muted-foreground text-sm">{t("noAppsDesc")}</p>
       </div>
     );
   }
@@ -68,10 +71,10 @@ export const ApplicationsTab = () => {
                 <span className={`text-xs px-2 py-0.5 rounded-full ${
                   s.status === "applied" ? "bg-success/15 text-success border border-success/30" : "bg-primary/10 text-primary border border-primary/30"
                 }`}>
-                  {s.status === "applied" ? "متقدّم" : "محفوظة"}
+                  {s.status === "applied" ? t("statusApplied") : t("statusSaved")}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {new Date(s.created_at).toLocaleDateString("ar-EG")}
+                  {new Date(s.created_at).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US")}
                 </span>
               </div>
             </div>
@@ -79,8 +82,8 @@ export const ApplicationsTab = () => {
           <div className="flex gap-2 mt-3">
             {s.status !== "applied" && (
               <Button size="sm" variant="luxe" className="flex-1" onClick={() => setStatus(s.id, "applied")}>
-                <CheckCircle2 className="w-3.5 h-3.5 ml-1" />
-                علّم كمتقدّم
+                <CheckCircle2 className={`w-3.5 h-3.5 ${isRtl ? "ml-1" : "mr-1"}`} />
+                {t("markApplied")}
               </Button>
             )}
             <Button size="sm" variant="ghostGold" onClick={() => remove(s.id)}>
