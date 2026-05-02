@@ -9,13 +9,11 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
-} from "@/components/ui/dialog";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { nativeShare } from "@/lib/share";
+import { PrivacySecurityPage } from "@/components/foras/PrivacySecurityPage";
 
 interface Props { open: boolean; onOpenChange: (v: boolean) => void; }
 
@@ -24,9 +22,15 @@ export const SettingsSheet = ({ open, onOpenChange }: Props) => {
   const { signOut } = useAuth();
   const { lang, dir, toggleLang, t } = useLanguage();
   const nav = useNavigate();
-  const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [view, setView] = useState<"main" | "privacy">("main");
   const isRtl = dir === "rtl";
   const alignClass = isRtl ? "text-right" : "text-left";
+
+  // Reset view when sheet closes
+  const handleOpenChange = (v: boolean) => {
+    if (!v) setView("main");
+    onOpenChange(v);
+  };
 
   const handleClearCache = () => {
     const keep = ["foras-dark", "foras-textonly", "foras-onboarded", "foras-lang", "foras-lang-manual"];
@@ -56,16 +60,19 @@ export const SettingsSheet = ({ open, onOpenChange }: Props) => {
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
         side={isRtl ? "left" : "right"}
         className="bg-card border-gold/30 w-[88%] sm:max-w-md flex flex-col p-0">
         <SheetHeader className="px-6 pt-6 pb-2 flex-shrink-0">
           <SheetTitle className={`text-gold-gradient font-display text-2xl ${alignClass}`}>
-            {t("settings")}
+            {view === "main" ? t("settings") : t("privacySection")}
           </SheetTitle>
         </SheetHeader>
 
+        {view === "privacy" ? (
+          <PrivacySecurityPage onBack={() => setView("main")} />
+        ) : (
         <div className="flex-1 overflow-y-auto px-6 pb-8 space-y-2 mt-4">
           <Row icon={Moon} label={t("darkMode")} align={alignClass}
             trailing={<Switch checked={darkMode} onCheckedChange={toggleDarkMode} />} />
@@ -77,7 +84,7 @@ export const SettingsSheet = ({ open, onOpenChange }: Props) => {
               </button>
             } />
           <Row icon={User} label={t("accountSettings")} align={alignClass} onClick={openProfile} />
-          <Row icon={Shield} label={t("privacy")} align={alignClass} onClick={() => setPrivacyOpen(true)} />
+          <Row icon={Shield} label={t("privacy")} align={alignClass} onClick={() => setView("privacy")} />
           <Row icon={Info} label={t("about")} align={alignClass}
             onClick={() => toast.info(lang === "ar"
               ? "الفرص v1.0 — منصة المنح والفرص العالمية"
@@ -118,23 +125,8 @@ export const SettingsSheet = ({ open, onOpenChange }: Props) => {
             </AlertDialog>
           </div>
         </div>
+        )}
       </SheetContent>
-
-      <Dialog open={privacyOpen} onOpenChange={setPrivacyOpen}>
-        <DialogContent className="bg-card border-gold/30 max-w-lg">
-          <DialogHeader>
-            <DialogTitle className={`${alignClass} text-gold-gradient font-display text-xl`}>
-              {t("privacyTitle")}
-            </DialogTitle>
-            <DialogDescription className={`${alignClass} text-muted-foreground leading-relaxed pt-2`}>
-              {t("privacyBody")}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="gold" onClick={() => setPrivacyOpen(false)}>{t("close")}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </Sheet>
   );
 };

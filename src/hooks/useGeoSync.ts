@@ -11,9 +11,10 @@ import { CURRENCIES } from "@/lib/mockData";
  */
 export const useGeoSync = () => {
   const { info } = useGeolocation(true);
-  const { setCountryCode, countryCode, setLocalCurrency, localCurrency, currencyManuallySet, setCity, city } = useSettings();
+  const { setCountryCode, countryCode, setLocalCurrency, localCurrency, currencyManuallySet, setCity, city, locationSharingEnabled } = useSettings();
 
   useEffect(() => {
+    if (!locationSharingEnabled) return;
     if (!info) return;
     const country =
       findCountryByCode(info.countryCode) ?? findCountryByName(info.country);

@@ -5,6 +5,7 @@ import { useSettings } from "@/contexts/SettingsContext";
 import { Input } from "@/components/ui/input";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { ENV } from "@/lib/env";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface WeatherData {
   temp: number;
@@ -15,31 +16,31 @@ interface WeatherData {
   country?: string;
 }
 
-const WMO: Record<number, { ar: string; bg: string; Icon: typeof Sun }> = {
-  0:  { ar: "صافٍ",          bg: "from-amber-500/30 via-orange-400/15 to-background", Icon: Sun },
-  1:  { ar: "غائم جزئياً",   bg: "from-amber-400/25 via-slate-500/15 to-background", Icon: Sun },
-  2:  { ar: "غائم جزئياً",   bg: "from-slate-400/25 via-slate-600/15 to-background", Icon: Cloud },
-  3:  { ar: "غائم",          bg: "from-slate-500/30 via-slate-700/20 to-background", Icon: Cloud },
-  45: { ar: "ضباب",          bg: "from-slate-400/30 via-slate-600/20 to-background", Icon: Cloud },
-  48: { ar: "ضباب كثيف",     bg: "from-slate-400/30 via-slate-600/20 to-background", Icon: Cloud },
-  51: { ar: "رذاذ خفيف",     bg: "from-sky-500/30 via-slate-600/20 to-background", Icon: CloudDrizzle },
-  53: { ar: "رذاذ",          bg: "from-sky-500/30 via-slate-600/20 to-background", Icon: CloudDrizzle },
-  55: { ar: "رذاذ كثيف",     bg: "from-sky-600/35 via-slate-700/20 to-background", Icon: CloudDrizzle },
-  61: { ar: "أمطار خفيفة",   bg: "from-sky-600/35 via-slate-700/25 to-background", Icon: CloudRain },
-  63: { ar: "أمطار",         bg: "from-sky-700/40 via-slate-800/25 to-background", Icon: CloudRain },
-  65: { ar: "أمطار غزيرة",   bg: "from-sky-800/45 via-slate-900/30 to-background", Icon: CloudRain },
-  71: { ar: "ثلوج خفيفة",    bg: "from-sky-200/30 via-slate-500/20 to-background", Icon: CloudSnow },
-  73: { ar: "ثلوج",          bg: "from-sky-200/35 via-slate-500/25 to-background", Icon: CloudSnow },
-  75: { ar: "ثلوج كثيفة",    bg: "from-sky-200/40 via-slate-500/30 to-background", Icon: CloudSnow },
-  80: { ar: "زخات مطر",      bg: "from-sky-700/40 via-slate-800/25 to-background", Icon: CloudRain },
-  81: { ar: "زخات مطر",      bg: "from-sky-700/40 via-slate-800/25 to-background", Icon: CloudRain },
-  82: { ar: "زخات عنيفة",    bg: "from-sky-800/45 via-slate-900/30 to-background", Icon: CloudRain },
-  95: { ar: "عاصفة رعدية",   bg: "from-purple-700/40 via-slate-900/30 to-background", Icon: CloudLightning },
-  96: { ar: "عاصفة برَدية",  bg: "from-purple-700/40 via-slate-900/30 to-background", Icon: CloudLightning },
-  99: { ar: "عاصفة برَدية",  bg: "from-purple-800/50 via-slate-900/35 to-background", Icon: CloudLightning },
+const WMO: Record<number, { ar: string; en: string; bg: string; Icon: typeof Sun }> = {
+  0:  { ar: "صافٍ",          en: "Clear",            bg: "from-amber-500/30 via-orange-400/15 to-background", Icon: Sun },
+  1:  { ar: "غائم جزئياً",   en: "Partly cloudy",    bg: "from-amber-400/25 via-slate-500/15 to-background", Icon: Sun },
+  2:  { ar: "غائم جزئياً",   en: "Partly cloudy",    bg: "from-slate-400/25 via-slate-600/15 to-background", Icon: Cloud },
+  3:  { ar: "غائم",          en: "Cloudy",           bg: "from-slate-500/30 via-slate-700/20 to-background", Icon: Cloud },
+  45: { ar: "ضباب",          en: "Fog",              bg: "from-slate-400/30 via-slate-600/20 to-background", Icon: Cloud },
+  48: { ar: "ضباب كثيف",     en: "Dense fog",        bg: "from-slate-400/30 via-slate-600/20 to-background", Icon: Cloud },
+  51: { ar: "رذاذ خفيف",     en: "Light drizzle",    bg: "from-sky-500/30 via-slate-600/20 to-background", Icon: CloudDrizzle },
+  53: { ar: "رذاذ",          en: "Drizzle",          bg: "from-sky-500/30 via-slate-600/20 to-background", Icon: CloudDrizzle },
+  55: { ar: "رذاذ كثيف",     en: "Heavy drizzle",    bg: "from-sky-600/35 via-slate-700/20 to-background", Icon: CloudDrizzle },
+  61: { ar: "أمطار خفيفة",   en: "Light rain",       bg: "from-sky-600/35 via-slate-700/25 to-background", Icon: CloudRain },
+  63: { ar: "أمطار",         en: "Rain",             bg: "from-sky-700/40 via-slate-800/25 to-background", Icon: CloudRain },
+  65: { ar: "أمطار غزيرة",   en: "Heavy rain",       bg: "from-sky-800/45 via-slate-900/30 to-background", Icon: CloudRain },
+  71: { ar: "ثلوج خفيفة",    en: "Light snow",       bg: "from-sky-200/30 via-slate-500/20 to-background", Icon: CloudSnow },
+  73: { ar: "ثلوج",          en: "Snow",             bg: "from-sky-200/35 via-slate-500/25 to-background", Icon: CloudSnow },
+  75: { ar: "ثلوج كثيفة",    en: "Heavy snow",       bg: "from-sky-200/40 via-slate-500/30 to-background", Icon: CloudSnow },
+  80: { ar: "زخات مطر",      en: "Rain showers",     bg: "from-sky-700/40 via-slate-800/25 to-background", Icon: CloudRain },
+  81: { ar: "زخات مطر",      en: "Rain showers",     bg: "from-sky-700/40 via-slate-800/25 to-background", Icon: CloudRain },
+  82: { ar: "زخات عنيفة",    en: "Heavy showers",    bg: "from-sky-800/45 via-slate-900/30 to-background", Icon: CloudRain },
+  95: { ar: "عاصفة رعدية",   en: "Thunderstorm",     bg: "from-purple-700/40 via-slate-900/30 to-background", Icon: CloudLightning },
+  96: { ar: "عاصفة برَدية",  en: "Hail storm",       bg: "from-purple-700/40 via-slate-900/30 to-background", Icon: CloudLightning },
+  99: { ar: "عاصفة برَدية",  en: "Severe hail",      bg: "from-purple-800/50 via-slate-900/35 to-background", Icon: CloudLightning },
 };
 
-const desc = (code: number) => WMO[code] ?? { ar: "—", bg: "from-slate-500/20 to-background", Icon: Cloud };
+const desc = (code: number) => WMO[code] ?? { ar: "—", en: "—", bg: "from-slate-500/20 to-background", Icon: Cloud };
 
 // Map OpenWeather "main" / id → WMO-like code so existing UI still works.
 const owToWmo = (id: number): number => {
@@ -102,6 +103,8 @@ export const WeatherWidget = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { info: geo } = useGeolocation(true);
+  const { t, lang, dir } = useLanguage();
+  const isRtl = dir === "rtl";
 
   const load = async (target: string) => {
     if (!target.trim()) return;
@@ -111,11 +114,11 @@ export const WeatherWidget = () => {
         ? await loadFromOpenWeather(target, ENV.OPENWEATHER_API_KEY).catch(() => null)
         : null;
       const finalResult = result ?? await loadFromOpenMeteo(target);
-      if (!finalResult) { setError("لم يتم العثور على المدينة"); setLoading(false); return; }
+      if (!finalResult) { setError(t("cityNotFound")); setLoading(false); return; }
       setData(finalResult);
       setCity(finalResult.city);
     } catch {
-      setError("تعذر تحديث الطقس");
+      setError(t("weatherFailed"));
     } finally { setLoading(false); }
   };
 
@@ -138,7 +141,7 @@ export const WeatherWidget = () => {
   const isClear = data && data.code === 0;
 
   return (
-    <div className={`relative overflow-hidden rounded-3xl border border-primary/30 shadow-luxe bg-gradient-to-br ${meta.bg}`} dir="rtl">
+    <div className={`relative overflow-hidden rounded-3xl border border-primary/30 shadow-luxe bg-gradient-to-br ${meta.bg}`} dir={dir}>
       {/* Live background effects */}
       {isClear && (
         <motion.div
@@ -173,17 +176,17 @@ export const WeatherWidget = () => {
       <div className="relative p-4">
         <form onSubmit={onSubmit} className="flex gap-2 mb-3">
           <div className="relative flex-1">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className={`absolute ${isRtl ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
             <Input
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="ابحث عن طقس مدينة أخرى..."
-              className="h-10 pr-9 bg-background/40 border-primary/20 text-right"
+              placeholder={t("searchCityPlaceholder")}
+              className={`h-10 ${isRtl ? "pr-9 text-right" : "pl-9 text-left"} bg-background/40 border-primary/20`}
             />
           </div>
           <button type="submit"
             className="h-10 px-3 rounded-md bg-gold-gradient text-primary-foreground text-xs font-bold shadow-gold whitespace-nowrap">
-            بحث
+            {t("search")}
           </button>
         </form>
 
@@ -191,16 +194,16 @@ export const WeatherWidget = () => {
 
         {data && (
           <div className="flex items-center justify-between gap-3">
-            <div className="text-right flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 justify-end text-xs text-muted-foreground mb-1">
+            <div className={`${isRtl ? "text-right" : "text-left"} flex-1 min-w-0`}>
+              <div className={`flex items-center gap-1.5 ${isRtl ? "justify-end" : "justify-start"} text-xs text-muted-foreground mb-1`}>
                 <span className="truncate">{data.city}{data.country ? `، ${data.country}` : ""}</span>
                 <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />
               </div>
               <p className="font-display text-4xl text-foreground leading-none" dir="ltr">
                 {data.temp}°<span className="text-base text-muted-foreground">C</span>
               </p>
-              <p className="text-xs text-primary mt-1">{meta.ar}</p>
-              <div className="flex items-center gap-3 justify-end mt-2 text-[10px] text-muted-foreground">
+              <p className="text-xs text-primary mt-1">{lang === "ar" ? meta.ar : meta.en}</p>
+              <div className={`flex items-center gap-3 ${isRtl ? "justify-end" : "justify-start"} mt-2 text-[10px] text-muted-foreground`}>
                 {data.humidity != null && (
                   <span className="flex items-center gap-1"><Droplets className="w-3 h-3" />{data.humidity}%</span>
                 )}
@@ -217,7 +220,7 @@ export const WeatherWidget = () => {
 
         {!data && !error && (
           <div className="flex items-center justify-center py-3 text-muted-foreground text-xs">
-            <RefreshCw className="w-3.5 h-3.5 animate-spin ml-2" /> جارٍ تحميل الطقس...
+            <RefreshCw className={`w-3.5 h-3.5 animate-spin ${isRtl ? "ml-2" : "mr-2"}`} /> {t("loadingWeather")}
           </div>
         )}
       </div>

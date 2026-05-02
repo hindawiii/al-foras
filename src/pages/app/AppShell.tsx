@@ -15,11 +15,11 @@ import { useGeoSync } from "@/hooks/useGeoSync";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const tabs = [
-  { id: "scholarships" as const, label: "المنح والفرص", icon: Award, comp: ScholarshipsTab },
-  { id: "news" as const, label: "الأخبار والاقتصاد", icon: Newspaper, comp: NewsTab },
-  { id: "currency" as const, label: "العملات", icon: Coins, comp: CurrencyTab },
-  { id: "applications" as const, label: "طلباتي", icon: Bookmark, comp: ApplicationsTab },
-  { id: "profile" as const, label: "الملف الشخصي", icon: User, comp: ProfileTab },
+  { id: "scholarships" as const, key: "tabScholarships", icon: Award, comp: ScholarshipsTab },
+  { id: "news" as const, key: "tabNews", icon: Newspaper, comp: NewsTab },
+  { id: "currency" as const, key: "tabCurrency", icon: Coins, comp: CurrencyTab },
+  { id: "applications" as const, key: "tabApplications", icon: Bookmark, comp: ApplicationsTab },
+  { id: "profile" as const, key: "tabProfile", icon: User, comp: ProfileTab },
 ];
 
 export const AppShell = () => {
@@ -29,7 +29,7 @@ export const AppShell = () => {
   const Active = tabs.find(t => t.id === tab)!.comp;
   useLiveNotifications();
   useGeoSync();
-  const { lang, toggleLang } = useLanguage();
+  const { lang, toggleLang, t: tr } = useLanguage();
 
   useEffect(() => {
     const onNav = (e: Event) => {
@@ -85,11 +85,11 @@ export const AppShell = () => {
       {/* Bottom navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-30 glass border-t border-primary/15">
         <div className="max-w-2xl mx-auto grid grid-cols-5">
-          {tabs.map(t => {
-            const Icon = t.icon;
-            const active = tab === t.id;
+          {tabs.map(tabItem => {
+            const Icon = tabItem.icon;
+            const active = tab === tabItem.id;
             return (
-              <button key={t.id} onClick={() => setTab(t.id)}
+              <button key={tabItem.id} onClick={() => setTab(tabItem.id)}
                 className="relative flex flex-col items-center gap-1 py-3 transition-colors">
                 {active && (
                   <motion.div layoutId="activeTab"
@@ -97,7 +97,7 @@ export const AppShell = () => {
                 )}
                 <Icon className={`w-5 h-5 transition-colors ${active ? "text-primary" : "text-muted-foreground"}`} />
                 <span className={`text-[10px] font-medium ${active ? "text-primary" : "text-muted-foreground"}`}>
-                  {t.label}
+                  {tr(tabItem.key)}
                 </span>
               </button>
             );
