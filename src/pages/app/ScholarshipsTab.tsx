@@ -11,9 +11,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { nativeShare } from "@/lib/share";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const ScholarshipsTab = () => {
   const { info: geo } = useGeolocation(true);
+  const { t, lang, dir } = useLanguage();
+  const isRtl = dir === "rtl";
+  const alignClass = isRtl ? "text-right" : "text-left";
 
   // Prioritise scholarships in user's country (if known), then the rest
   const orderedDeck = useMemo(() => {
@@ -72,9 +76,9 @@ export const ScholarshipsTab = () => {
         user_id: user.id, scholarship_id: s.id, scholarship_title: s.title,
         scholarship_data: s as any, status: "saved",
       }, { onConflict: "user_id,scholarship_id" });
-      toast.success("تم حفظ المنحة في طلباتك");
+      toast.success(t("saved"));
     } else if (dir === "left") {
-      toast("تم تجاهل المنحة", { description: s.title });
+      toast(t("dismissed"), { description: s.title });
     }
     setDeck(prev => prev.slice(1));
   };
@@ -93,7 +97,7 @@ export const ScholarshipsTab = () => {
     <div className="relative h-[calc(100vh-180px)] flex flex-col">
       <div className="mb-3 px-1 text-[11px] text-muted-foreground flex items-center gap-1.5 leading-relaxed">
         <Globe className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-        <span>الفرص مجمّعة من مصادر رسمية عالمية وعربية، ومُرتّبة حسب موقعك واهتماماتك.</span>
+        <span>{t("scholarshipsHint")}</span>
       </div>
 
       <AnimatePresence>
@@ -106,9 +110,9 @@ export const ScholarshipsTab = () => {
               <span className="text-primary-foreground font-bold text-xs">AI</span>
             </div>
             <div className="flex-1">
-              <p className="text-xs text-primary font-bold mb-0.5">مطابقة ذكية جديدة</p>
+              <p className="text-xs text-primary font-bold mb-0.5">{t("aiMatchBadge")}</p>
               <p className="text-sm text-foreground leading-snug">
-                وجدنا 3 منح تطابق مهاراتك بناءً على تحليل أحدث الأخبار العالمية
+                {t("aiMatchBody")}
               </p>
             </div>
             <button onClick={() => setAiNotice(false)} className="text-muted-foreground text-xs">✕</button>
@@ -122,9 +126,9 @@ export const ScholarshipsTab = () => {
             <div className="w-24 h-24 rounded-3xl bg-card-gradient border-gold flex items-center justify-center mb-6">
               <Award className="w-12 h-12 text-primary" strokeWidth={1.2} />
             </div>
-            <h3 className="font-display text-2xl text-gold-gradient mb-2">انتهت المنح المتاحة</h3>
-            <p className="text-muted-foreground mb-6">سنخبرك حال توفر منح جديدة تناسبك</p>
-            <Button variant="luxe" onClick={() => setDeck(SCHOLARSHIPS)}>إعادة التحميل</Button>
+            <h3 className="font-display text-2xl text-gold-gradient mb-2">{t("noMoreScholarships")}</h3>
+            <p className="text-muted-foreground mb-6">{t("noMoreScholarshipsDesc")}</p>
+            <Button variant="luxe" onClick={() => setDeck(SCHOLARSHIPS)}>{t("reload")}</Button>
           </div>
         ) : (
           deck.slice(0, 3).map((s, i) => (
@@ -142,7 +146,7 @@ export const ScholarshipsTab = () => {
       </div>
 
       <p className="text-center text-xs text-muted-foreground pt-3">
-        اسحب لليمين للحفظ • لليسار للتجاهل
+        {t("swipeHint")}
       </p>
 
       <Sheet open={!!detail} onOpenChange={(v) => !v && setDetail(null)}>
@@ -154,12 +158,12 @@ export const ScholarshipsTab = () => {
                   <div className="flex flex-wrap gap-2">
                     {detail.verified && (
                       <span className="inline-flex items-center gap-1 bg-verified/15 border border-verified/40 text-verified px-2 py-1 rounded-full text-xs font-medium">
-                        <BadgeCheck className="w-3.5 h-3.5" /> موثقة
+                        <BadgeCheck className="w-3.5 h-3.5" /> {t("verified")}
                       </span>
                     )}
                     {detail.manualReview && (
                       <span className="inline-flex items-center gap-1 bg-review/15 border border-review/40 text-review px-2 py-1 rounded-full text-xs">
-                        <Search className="w-3.5 h-3.5" /> مراجعة يدوية
+                        <Search className="w-3.5 h-3.5" /> {t("manualReview")}
                       </span>
                     )}
                   </div>
@@ -169,21 +173,21 @@ export const ScholarshipsTab = () => {
                     <Share2 className="w-4 h-4 text-primary" />
                   </button>
                 </div>
-                <SheetTitle className="text-right font-display text-2xl text-gold-gradient">{detail.title}</SheetTitle>
-                <p className="text-primary text-sm text-right">{detail.org}</p>
+                <SheetTitle className={`${alignClass} font-display text-2xl text-gold-gradient`}>{detail.title}</SheetTitle>
+                <p className={`text-primary text-sm ${alignClass}`}>{detail.org}</p>
               </SheetHeader>
               <div className="space-y-4 mt-6 pb-6">
                 <div className="bg-primary/10 border border-primary/30 rounded-xl p-3 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-primary" />
-                  <span className="text-sm text-foreground">مناسبة لك بنسبة</span>
-                  <span className="font-bold text-primary text-lg mr-auto">{computeMatchScore(detail, profile)}%</span>
+                  <span className="text-sm text-foreground">{t("matchPercent")}</span>
+                  <span className={`font-bold text-primary text-lg ${isRtl ? "mr-auto" : "ml-auto"}`}>{computeMatchScore(detail, profile)}%</span>
                 </div>
                 <p className="text-foreground leading-relaxed">{detail.description}</p>
                 <div className="grid grid-cols-2 gap-3">
-                  <Detail icon={MapPin} label="الدولة" value={detail.country} />
-                  <Detail icon={Award} label="المبلغ" value={detail.amount} />
-                  <Detail icon={Clock} label="آخر موعد" value={new Date(detail.deadline).toLocaleDateString("ar-EG")} />
-                  <Detail icon={BadgeCheck} label="المستوى" value={detail.level} />
+                  <Detail icon={MapPin} label={t("country")} value={detail.country} />
+                  <Detail icon={Award} label={t("amount")} value={detail.amount} />
+                  <Detail icon={Clock} label={t("deadline")} value={new Date(detail.deadline).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US")} />
+                  <Detail icon={BadgeCheck} label={t("level")} value={detail.level} />
                 </div>
 
                 <div className="grid grid-cols-1 gap-2 pt-2">
@@ -193,17 +197,17 @@ export const ScholarshipsTab = () => {
                       setBrowserTitle(detail.title);
                       setDetail(null);
                     }}>
-                    <ExternalLink className="w-4 h-4 ml-2" />
-                    التقديم على الموقع الرسمي
+                    <ExternalLink className={`w-4 h-4 ${isRtl ? "ml-2" : "mr-2"}`} />
+                    {t("applyOfficial")}
                   </Button>
                   <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
-                    سيتم فتح الموقع الرسمي للجهة المانحة داخل التطبيق لتقديم طلبك مباشرة.
+                    {t("applyOfficialNote")}
                   </p>
                 </div>
 
                 <div className="border-t border-border pt-3 mt-2">
                   <p className="text-[11px] text-muted-foreground mb-1.5 flex items-center gap-1.5">
-                    <Link2 className="w-3 h-3 text-primary" /> رابط المصدر
+                    <Link2 className="w-3 h-3 text-primary" /> {t("sourceLink")}
                   </p>
                   <a href={detail.sourceUrl} target="_blank" rel="noopener noreferrer"
                     dir="ltr" className="text-xs text-primary hover:underline break-all block text-left">
