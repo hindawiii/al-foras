@@ -6,26 +6,26 @@
 
 @layer base {
   :root {
-    /* Al-Foras Luxury Theme — Deep Black & Matte Gold */
-    --background: 0 0% 4%;
-    --foreground: 45 30% 92%;
+    /* Al-Foras Luxury Theme — Permanent Dark (OLED Black & Matte Gold) */
+    --background: 0 0% 0%;            /* OLED Black #000000 */
+    --foreground: 0 0% 100%;          /* Pure White #FFFFFF */
 
-    --card: 0 0% 7%;
-    --card-foreground: 45 30% 92%;
+    --card: 0 0% 7%;                  /* #121212 */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 6%;
-    --popover-foreground: 45 30% 92%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
 
     --primary: 43 74% 38%;          /* Matte Gold #B8860B */
     --primary-foreground: 0 0% 6%;
     --primary-glow: 43 80% 55%;
     --primary-deep: 38 65% 28%;
 
-    --secondary: 0 0% 11%;
-    --secondary-foreground: 45 30% 92%;
+    --secondary: 0 0% 7%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 0 0% 10%;
-    --muted-foreground: 45 8% 60%;
+    --muted: 0 0% 7%;
+    --muted-foreground: 0 0% 63%;     /* #A0A0A0 */
 
     --accent: 43 74% 38%;
     --accent-foreground: 0 0% 6%;
@@ -55,25 +55,7 @@
     --transition-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .light {
-    --background: 40 30% 96%;
-    --foreground: 0 0% 8%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 8%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
-    --primary: 43 74% 38%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 40 20% 92%;
-    --secondary-foreground: 0 0% 8%;
-    --muted: 40 20% 90%;
-    --muted-foreground: 0 0% 40%;
-    --accent: 43 74% 38%;
-    --accent-foreground: 0 0% 100%;
-    --border: 43 30% 80%;
-    --input: 40 20% 92%;
-    --ring: 43 74% 45%;
-  }
+  /* Light mode disabled — app is permanently dark. */
 }
 
 @layer base {

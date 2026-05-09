@@ -83,7 +83,10 @@ export const AppShell = () => {
       </main>
 
       {/* Bottom navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 glass border-t border-primary/15">
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-30 backdrop-blur-md border-t border-primary/30"
+        style={{ backgroundColor: "rgba(0,0,0,0.85)" }}
+      >
         <div className="max-w-2xl mx-auto grid grid-cols-5">
           {tabs.map(tabItem => {
             const Icon = tabItem.icon;

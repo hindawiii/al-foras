@@ -33,7 +33,9 @@ const Ctx = createContext<SettingsCtx>({
 });
 
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("foras-dark") !== "false");
+  // Permanent dark mode — toggle is disabled.
+  const darkMode = true;
+  const toggleDarkMode = () => {};
   const [textOnly, setTextOnly] = useState(() => localStorage.getItem("foras-textonly") === "true");
   const [localCurrency, setLocalCurrencyState] = useState(() => localStorage.getItem("foras-localcurrency") || "SAR");
   const [city, setCityState] = useState(() => localStorage.getItem("foras-city") || "الرياض");
@@ -61,9 +63,10 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    document.documentElement.classList.toggle("light", !darkMode);
-    localStorage.setItem("foras-dark", String(darkMode));
-  }, [darkMode]);
+    document.documentElement.classList.remove("light");
+    document.documentElement.classList.add("dark");
+    localStorage.setItem("foras-dark", "true");
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("foras-textonly", String(textOnly));
@@ -89,7 +92,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   return (
     <Ctx.Provider value={{
       darkMode,
-      toggleDarkMode: () => setDarkMode(v => !v),
+      toggleDarkMode,
       textOnly,
       toggleTextOnly: () => setTextOnly(v => !v),
       localCurrency, setLocalCurrency,
