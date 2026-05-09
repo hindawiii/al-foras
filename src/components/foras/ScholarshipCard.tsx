@@ -1,7 +1,8 @@
 import { motion, PanInfo, useMotionValue, useTransform } from "framer-motion";
-import { BadgeCheck, Clock, MapPin, Award, X, Heart, Search, Link2, Share2, Sparkles } from "lucide-react";
+import { BadgeCheck, Clock, MapPin, Award, X, Heart, Search, Link2, Share2, Sparkles, Languages } from "lucide-react";
 import { Scholarship } from "@/lib/mockData";
 import { nativeShare } from "@/lib/share";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Props {
   scholarship: Scholarship;
@@ -18,6 +19,8 @@ const buildShareUrl = (id: string) => {
 };
 
 export const ScholarshipCard = ({ scholarship, onSwipe, onTap, active, index, matchScore }: Props) => {
+  const { t, dir } = useLanguage();
+  const isRtl = dir === "rtl";
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
   const opacity = useTransform(x, [-200, -50, 0, 50, 200], [0, 1, 1, 1, 0]);
@@ -38,6 +41,20 @@ export const ScholarshipCard = ({ scholarship, onSwipe, onTap, active, index, ma
     });
   };
 
+  const isArab = scholarship.category === "arab";
+  // Category-driven accents: gold-ish for Arab, cool silver/blue for Global.
+  const borderClass = isArab
+    ? "border-[hsl(43_74%_45%/0.55)]"
+    : "border-[hsl(210_70%_60%/0.45)]";
+  const glowClass = isArab
+    ? "shadow-[0_25px_60px_-25px_hsl(43_74%_38%/0.55)]"
+    : "shadow-[0_25px_60px_-25px_hsl(210_70%_50%/0.5)]";
+  const stripClass = isArab ? "bg-gold-gradient" : "bg-gradient-to-r from-[hsl(210_70%_55%)] via-[hsl(200_80%_70%)] to-[hsl(220_60%_55%)]";
+  const studyLangLabel =
+    scholarship.studyLang === "ar" ? t("langArabic")
+      : scholarship.studyLang === "en" ? t("langEnglish")
+      : t("langBoth");
+
   return (
     <motion.div
       drag={active ? "x" : false}
@@ -47,70 +64,92 @@ export const ScholarshipCard = ({ scholarship, onSwipe, onTap, active, index, ma
       style={{ x, rotate, opacity, zIndex: 10 - index }}
       initial={{ scale: 1 - index * 0.04, y: index * -8 }}
       animate={{ scale: 1 - index * 0.04, y: index * -8 }}
-      whileTap={{ cursor: active ? "grabbing" : "default" }}
+      whileHover={active ? { scale: 1.015, y: index * -8 - 4 } : undefined}
+      whileTap={{ cursor: active ? "grabbing" : "default", scale: active ? 0.985 : undefined }}
       className="absolute inset-0 select-none"
     >
-      <div className="relative h-full bg-card-gradient border-gold border rounded-3xl shadow-luxe overflow-hidden cursor-grab active:cursor-grabbing flex flex-col">
-        <div className="h-2 bg-gold-gradient flex-shrink-0" />
+      <div
+        className={`relative h-full rounded-3xl overflow-hidden cursor-grab active:cursor-grabbing flex flex-col border backdrop-blur-xl bg-card/40 ${borderClass} ${glowClass} transition-all duration-300`}
+        style={{ backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
+      >
+        {/* subtle inner gradient sheen */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-white/[0.02]" />
+        <div className={`h-1.5 ${stripClass} flex-shrink-0 relative z-10`} />
 
         <motion.div style={{ opacity: saveOpacity }}
           className="absolute top-20 right-8 border-4 border-success rounded-2xl px-4 py-2 rotate-12 z-20">
-          <span className="text-success font-bold text-2xl">حفظ</span>
+          <span className="text-success font-bold text-2xl">{t("saved").split("·")[0]?.trim() || t("saved")}</span>
         </motion.div>
         <motion.div style={{ opacity: ignoreOpacity }}
           className="absolute top-20 left-8 border-4 border-destructive rounded-2xl px-4 py-2 -rotate-12 z-20">
-          <span className="text-destructive font-bold text-2xl">تجاهل</span>
+          <span className="text-destructive font-bold text-2xl">{t("dismissed")}</span>
         </motion.div>
 
-        <div className="p-6 pt-5 flex flex-col flex-1" dir="rtl">
-          {/* Top: badges + share */}
+        <div className="p-6 pt-5 flex flex-col flex-1 relative z-10" dir={dir}>
+          {/* Top row: flag avatar + match pill (start) | badges + share (end) */}
           <div className="flex items-start justify-between gap-2 mb-3">
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <div
+                className={`w-11 h-11 rounded-full flex items-center justify-center text-2xl bg-background/70 border ${isArab ? "border-primary/50" : "border-[hsl(210_70%_60%/0.5)]"} shadow-inner`}
+                aria-label={scholarship.country}
+              >
+                <span>{scholarship.flag}</span>
+              </div>
+              <span
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border backdrop-blur-md
+                  ${isArab
+                    ? "bg-primary/15 border-primary/40 text-primary shadow-[0_0_18px_-2px_hsl(43_74%_45%/0.55)]"
+                    : "bg-[hsl(210_70%_55%/0.15)] border-[hsl(210_70%_60%/0.5)] text-[hsl(210_90%_75%)] shadow-[0_0_18px_-2px_hsl(210_70%_55%/0.55)]"}`}
+              >
+                <Sparkles className="w-3 h-3" /> {matchScore}%
+              </span>
+            </div>
             <div className="flex flex-wrap gap-1.5">
               {scholarship.verified && (
                 <span className="flex items-center gap-1 bg-verified/15 border border-verified/40 text-verified px-2 py-0.5 rounded-full text-[11px] font-medium">
-                  <BadgeCheck className="w-3 h-3" /> موثقة
+                  <BadgeCheck className="w-3 h-3" /> {t("verified")}
                 </span>
               )}
               {scholarship.manualReview && (
                 <span className="flex items-center gap-1 bg-review/15 border border-review/40 text-review px-2 py-0.5 rounded-full text-[11px] font-medium">
-                  <Search className="w-3 h-3" /> مراجعة يدوية
+                  <Search className="w-3 h-3" /> {t("manualReview")}
                 </span>
               )}
-              <span className="flex items-center gap-1 bg-primary/10 border border-primary/30 text-primary px-2 py-0.5 rounded-full text-[11px] font-bold">
-                <Sparkles className="w-3 h-3" /> {matchScore}%
-              </span>
+              <button onClick={handleShare}
+                className="w-8 h-8 rounded-full bg-background/60 backdrop-blur-sm border border-primary/30 hover:bg-primary/20 flex items-center justify-center flex-shrink-0"
+                aria-label="share">
+                <Share2 className="w-3.5 h-3.5 text-primary" />
+              </button>
             </div>
-            <button onClick={handleShare}
-              className="w-9 h-9 rounded-full bg-background/60 backdrop-blur-sm border border-primary/30 hover:bg-primary/20 flex items-center justify-center flex-shrink-0"
-              aria-label="مشاركة">
-              <Share2 className="w-4 h-4 text-primary" />
-            </button>
           </div>
 
           {/* Title block */}
-          <div className="text-right mb-4">
+          <div className={`${isRtl ? "text-right" : "text-left"} mb-4`}>
             <p className="text-primary text-xs font-medium mb-1">{scholarship.org}</p>
             <h3 className="font-display text-2xl text-foreground leading-tight line-clamp-3">
               {scholarship.title}
             </h3>
           </div>
 
-          <p className="text-muted-foreground text-sm leading-relaxed mb-4 line-clamp-3 text-right">
+          <p className={`text-muted-foreground text-sm leading-relaxed mb-4 line-clamp-3 ${isRtl ? "text-right" : "text-left"}`}>
             {scholarship.description}
           </p>
 
           {/* Detail rows */}
           <div className="space-y-2 mb-4">
-            <Row icon={MapPin} label="الدولة" value={scholarship.country} />
-            <Row icon={Award} label="المبلغ" value={scholarship.amount} />
-            <Row icon={Clock} label="آخر موعد" value={new Date(scholarship.deadline).toLocaleDateString("ar-EG")} />
+            <Row icon={MapPin} label={t("country")} value={scholarship.country} />
+            <Row icon={Award} label={t("amount")} value={scholarship.amount} />
+            <Row icon={Clock} label={t("deadline")} value={new Date(scholarship.deadline).toLocaleDateString(isRtl ? "ar-EG" : "en-US")} />
           </div>
 
-          {/* Tags */}
+          {/* Tags + study language */}
           <div className="flex flex-wrap gap-1.5 mb-3">
-            {scholarship.tags.map(t => (
-              <span key={t} className="text-[11px] bg-primary/10 border border-primary/20 text-primary px-2 py-0.5 rounded-full">
-                {t}
+            <span className="inline-flex items-center gap-1 text-[11px] bg-background/60 border border-primary/30 text-primary px-2 py-0.5 rounded-full">
+              <Languages className="w-3 h-3" /> {t("studyLanguage")}: {studyLangLabel}
+            </span>
+            {scholarship.tags.map(tag => (
+              <span key={tag} className="text-[11px] bg-primary/10 border border-primary/20 text-primary px-2 py-0.5 rounded-full">
+                {tag}
               </span>
             ))}
           </div>

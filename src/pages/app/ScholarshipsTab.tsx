@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { ExternalLink, BadgeCheck, Search, Award, MapPin, Clock, Link2, Share2, Sparkles, Globe } from "lucide-react";
+import { ExternalLink, BadgeCheck, Search, Award, MapPin, Clock, Link2, Share2, Sparkles, Globe, Star } from "lucide-react";
 import { ScholarshipCard } from "@/components/foras/ScholarshipCard";
 import { InAppBrowser } from "@/components/foras/InAppBrowser";
 import { SCHOLARSHIPS, Scholarship, computeMatchScore } from "@/lib/mockData";
@@ -19,16 +19,19 @@ export const ScholarshipsTab = () => {
   const isRtl = dir === "rtl";
   const alignClass = isRtl ? "text-right" : "text-left";
 
-  // Prioritise scholarships in user's country (if known), then the rest
+  const [filter, setFilter] = useState<"arab" | "global">("arab");
+
+  // Filter by category, then prioritise scholarships in user's country
   const orderedDeck = useMemo(() => {
+    const filtered = SCHOLARSHIPS.filter(s => s.category === filter);
     const country = (geo?.country || "").toLowerCase();
-    if (!country) return SCHOLARSHIPS;
-    const matches = SCHOLARSHIPS.filter(s =>
+    if (!country) return filtered;
+    const matches = filtered.filter(s =>
       s.country.toLowerCase().includes(country) || country.includes(s.country.toLowerCase())
     );
-    const rest = SCHOLARSHIPS.filter(s => !matches.includes(s));
+    const rest = filtered.filter(s => !matches.includes(s));
     return [...matches, ...rest];
-  }, [geo?.country]);
+  }, [geo?.country, filter]);
 
   const [deck, setDeck] = useState<Scholarship[]>(orderedDeck);
   const [detail, setDetail] = useState<Scholarship | null>(null);
@@ -47,7 +50,7 @@ export const ScholarshipsTab = () => {
   useEffect(() => {
     setDeck(orderedDeck);
     // eslint-disable-next-line
-  }, [orderedDeck.length, geo?.country]);
+  }, [orderedDeck.length, geo?.country, filter]);
 
   // Deep-link: open detail when ?scholarship=ID is in URL
   useEffect(() => {
@@ -95,6 +98,31 @@ export const ScholarshipsTab = () => {
 
   return (
     <div className="relative h-[calc(100vh-180px)] flex flex-col">
+      {/* Segmented filter — Arab vs Global */}
+      <div className="mb-3 px-1">
+        <div className="relative inline-flex w-full p-1 rounded-2xl bg-card/60 backdrop-blur-md border border-border overflow-hidden">
+          {(["arab", "global"] as const).map((key) => {
+            const active = filter === key;
+            const isArab = key === "arab";
+            return (
+              <button
+                key={key}
+                onClick={() => setFilter(key)}
+                className={`relative flex-1 z-10 px-3 py-2 text-xs sm:text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all duration-300
+                  ${active
+                    ? isArab
+                      ? "bg-gold-gradient text-primary-foreground shadow-gold"
+                      : "bg-gradient-to-r from-[hsl(210_70%_50%)] to-[hsl(220_60%_45%)] text-white shadow-[0_8px_24px_-8px_hsl(210_70%_50%/0.6)]"
+                    : "text-muted-foreground hover:text-foreground"}`}
+              >
+                {isArab ? <Star className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />}
+                {isArab ? t("filterArabScholarships") : t("filterGlobalScholarships")}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="mb-3 px-1 text-[11px] text-muted-foreground flex items-center gap-1.5 leading-relaxed">
         <Globe className="w-3.5 h-3.5 text-primary flex-shrink-0" />
         <span>{t("scholarshipsHint")}</span>
@@ -126,9 +154,9 @@ export const ScholarshipsTab = () => {
             <div className="w-24 h-24 rounded-3xl bg-card-gradient border-gold flex items-center justify-center mb-6">
               <Award className="w-12 h-12 text-primary" strokeWidth={1.2} />
             </div>
-            <h3 className="font-display text-2xl text-gold-gradient mb-2">{t("noMoreScholarships")}</h3>
+            <h3 className="font-display text-2xl text-gold-gradient mb-2">{t("noScholarshipsCategory")}</h3>
             <p className="text-muted-foreground mb-6">{t("noMoreScholarshipsDesc")}</p>
-            <Button variant="luxe" onClick={() => setDeck(SCHOLARSHIPS)}>{t("reload")}</Button>
+            <Button variant="luxe" onClick={() => setDeck(orderedDeck)}>{t("reload")}</Button>
           </div>
         ) : (
           deck.slice(0, 3).map((s, i) => (

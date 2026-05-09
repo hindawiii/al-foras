@@ -3,6 +3,10 @@ export interface Scholarship {
   title: string;
   org: string;
   country: string;
+  countryCode: string;     // ISO 3166-1 alpha-2
+  flag: string;            // emoji flag
+  category: "arab" | "global";
+  studyLang: "ar" | "en" | "both";
   deadline: string;
   amount: string;
   field: string;
@@ -26,6 +30,7 @@ const mk = (s: Omit<Scholarship, "sourceUrl" | "officialUrl" | "interests"> & Pa
 export const SCHOLARSHIPS: Scholarship[] = [
   mk({
     id: "s1", title: "منحة تشيفنينغ البريطانية الكاملة", org: "الحكومة البريطانية", country: "المملكة المتحدة",
+    countryCode: "GB", flag: "🇬🇧", category: "global", studyLang: "en",
     deadline: "2026-11-01", amount: "تمويل كامل", field: "متعدد التخصصات", level: "ماجستير",
     verified: true, description: "منحة دراسية كاملة لقادة المستقبل تشمل الرسوم والإقامة والسفر.",
     tags: ["قيادة", "ماجستير", "أوروبا"],
@@ -34,6 +39,7 @@ export const SCHOLARSHIPS: Scholarship[] = [
   }),
   mk({
     id: "s2", title: "منحة فولبرايت للدراسات العليا", org: "السفارة الأمريكية", country: "الولايات المتحدة",
+    countryCode: "US", flag: "🇺🇸", category: "global", studyLang: "en",
     deadline: "2026-09-15", amount: "$45,000", field: "العلوم والهندسة", level: "ماجستير ودكتوراه",
     verified: true, description: "برنامج تبادل أكاديمي مرموق يدعم الدراسات العليا والبحث العلمي في أمريكا.",
     tags: ["بحث", "أمريكا", "دكتوراه"],
@@ -42,6 +48,7 @@ export const SCHOLARSHIPS: Scholarship[] = [
   }),
   mk({
     id: "s3", title: "منحة DAAD الألمانية", org: "الهيئة الألمانية للتبادل", country: "ألمانيا",
+    countryCode: "DE", flag: "🇩🇪", category: "global", studyLang: "en",
     deadline: "2026-10-20", amount: "€934/شهر", field: "هندسة وتكنولوجيا", level: "ماجستير",
     verified: true, description: "منح شهرية مع تأمين صحي ودعم لتعلم اللغة الألمانية.",
     tags: ["ألمانيا", "هندسة"],
@@ -50,6 +57,7 @@ export const SCHOLARSHIPS: Scholarship[] = [
   }),
   mk({
     id: "s4", title: "منحة الملك عبدالله للتميز العلمي", org: "جامعة كاوست", country: "المملكة العربية السعودية",
+    countryCode: "SA", flag: "🇸🇦", category: "arab", studyLang: "both",
     deadline: "2026-12-01", amount: "تمويل كامل + راتب", field: "علوم وتكنولوجيا", level: "ماجستير ودكتوراه",
     verified: true, description: "تمويل كامل مع راتب شهري وسكن للدراسات العليا في كاوست.",
     tags: ["السعودية", "كاوست"],
@@ -58,6 +66,7 @@ export const SCHOLARSHIPS: Scholarship[] = [
   }),
   mk({
     id: "s5", title: "برنامج إيراسموس موندوس", org: "الاتحاد الأوروبي", country: "أوروبا",
+    countryCode: "EU", flag: "🇪🇺", category: "global", studyLang: "en",
     deadline: "2026-01-10", amount: "€1,400/شهر", field: "متعدد التخصصات", level: "ماجستير مشترك",
     verified: false, manualReview: true,
     description: "برنامج ماجستير مشترك بين عدة جامعات أوروبية مع منحة شاملة.",
@@ -67,6 +76,7 @@ export const SCHOLARSHIPS: Scholarship[] = [
   }),
   mk({
     id: "s6", title: "منحة جامعة طوكيو الدولية", org: "MEXT اليابان", country: "اليابان",
+    countryCode: "JP", flag: "🇯🇵", category: "global", studyLang: "en",
     deadline: "2026-06-30", amount: "¥147,000/شهر", field: "هندسة وعلوم", level: "بكالوريوس وماجستير",
     verified: true, description: "منحة حكومية يابانية كاملة تشمل الرسوم وتذاكر السفر والراتب.",
     tags: ["اليابان", "آسيا"],
@@ -75,6 +85,7 @@ export const SCHOLARSHIPS: Scholarship[] = [
   }),
   mk({
     id: "s7", title: "منحة قطر للتنمية البشرية", org: "مؤسسة قطر", country: "قطر",
+    countryCode: "QA", flag: "🇶🇦", category: "arab", studyLang: "both",
     deadline: "2026-08-15", amount: "تمويل كامل", field: "السياسات والإدارة", level: "ماجستير",
     verified: false, manualReview: true,
     description: "برنامج رائد لتنمية الكوادر القيادية في المنطقة العربية.",
@@ -84,11 +95,30 @@ export const SCHOLARSHIPS: Scholarship[] = [
   }),
   mk({
     id: "s8", title: "منحة ETH زيورخ للهندسة", org: "ETH Zürich", country: "سويسرا",
+    countryCode: "CH", flag: "🇨🇭", category: "global", studyLang: "en",
     deadline: "2026-12-15", amount: "CHF 11,000/سنة", field: "هندسة وحاسوب", level: "ماجستير",
     verified: true, description: "منحة تميز للطلاب الدوليين المتفوقين في تخصصات الهندسة.",
     tags: ["سويسرا", "تميز"],
     interests: ["هندسة", "تكنولوجيا"],
     officialUrl: "https://ethz.ch/", sourceUrl: "https://ethz.ch/students/en/studies/financial/scholarships.html",
+  }),
+  mk({
+    id: "s9", title: "منحة جامعة الإمارات للماجستير", org: "جامعة الإمارات", country: "الإمارات",
+    countryCode: "AE", flag: "🇦🇪", category: "arab", studyLang: "both",
+    deadline: "2026-07-20", amount: "تمويل كامل + سكن", field: "متعدد التخصصات", level: "ماجستير",
+    verified: true, description: "منحة شاملة تغطي الرسوم والسكن لطلاب الدراسات العليا في الإمارات.",
+    tags: ["الإمارات", "ماجستير"],
+    interests: ["إدارة", "هندسة"],
+    officialUrl: "https://www.uaeu.ac.ae/", sourceUrl: "https://www.uaeu.ac.ae/en/admission/",
+  }),
+  mk({
+    id: "s10", title: "منحة الأزهر الشريف للوافدين", org: "جامعة الأزهر", country: "مصر",
+    countryCode: "EG", flag: "🇪🇬", category: "arab", studyLang: "ar",
+    deadline: "2026-09-30", amount: "رسوم + إقامة", field: "علوم شرعية ولغوية", level: "بكالوريوس وماجستير",
+    verified: true, description: "منحة الأزهر الشريف للطلاب الوافدين لدراسة العلوم الشرعية واللغة العربية.",
+    tags: ["مصر", "الأزهر"],
+    interests: ["تعليم", "بحث"],
+    officialUrl: "https://www.azhar.edu.eg/", sourceUrl: "https://www.azhar.edu.eg/",
   }),
 ];
 
