@@ -78,11 +78,11 @@ export const ScholarshipCard = ({ scholarship, onSwipe, onTap, active, index, ma
 
         <motion.div style={{ opacity: saveOpacity }}
           className="absolute top-20 right-8 border-4 border-success rounded-2xl px-4 py-2 rotate-12 z-20">
-          <span className="text-success font-bold text-2xl">حفظ</span>
+          <span className="text-success font-bold text-2xl">{t("saved").split("·")[0]?.trim() || t("saved")}</span>
         </motion.div>
         <motion.div style={{ opacity: ignoreOpacity }}
           className="absolute top-20 left-8 border-4 border-destructive rounded-2xl px-4 py-2 -rotate-12 z-20">
-          <span className="text-destructive font-bold text-2xl">تجاهل</span>
+          <span className="text-destructive font-bold text-2xl">{t("dismissed")}</span>
         </motion.div>
 
         <div className="p-6 pt-5 flex flex-col flex-1 relative z-10" dir={dir}>
