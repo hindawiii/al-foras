@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Moon, User, Shield, Info, Trash2, LogOut, Share2, Languages } from "lucide-react";
+import { User, Shield, Info, Trash2, LogOut, Share2, Languages } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -18,7 +18,6 @@ import { PrivacySecurityPage } from "@/components/foras/PrivacySecurityPage";
 interface Props { open: boolean; onOpenChange: (v: boolean) => void; }
 
 export const SettingsSheet = ({ open, onOpenChange }: Props) => {
-  const { darkMode, toggleDarkMode } = useSettings();
   const { signOut } = useAuth();
   const { lang, dir, toggleLang, t } = useLanguage();
   const nav = useNavigate();
@@ -74,8 +73,6 @@ export const SettingsSheet = ({ open, onOpenChange }: Props) => {
           <PrivacySecurityPage onBack={() => setView("main")} />
         ) : (
         <div className="flex-1 overflow-y-auto px-6 pb-8 space-y-2 mt-4">
-          <Row icon={Moon} label={t("darkMode")} align={alignClass}
-            trailing={<Switch checked={darkMode} onCheckedChange={toggleDarkMode} />} />
           <Row icon={Languages} label={t("language")} align={alignClass}
             trailing={
               <button onClick={toggleLang}
