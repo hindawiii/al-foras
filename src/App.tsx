@@ -21,7 +21,9 @@ const App = () => (
             <Sonner position="top-center" richColors closeButton />
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<Landing />} />
+                <Route path="/app" element={<Index />} />
+                <Route path="/dashboard" element={<Index />} />
                 <Route path="/landing" element={<Landing />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="*" element={<NotFound />} />
