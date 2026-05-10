@@ -13,7 +13,7 @@ const Landing = () => {
   const nav = useNavigate();
   const { user } = useAuth();
 
-  const goApp = () => nav(user ? "/" : "/auth");
+  const goApp = () => nav(user ? "/app" : "/auth");
   const featured = SCHOLARSHIPS.slice(0, 4);
 
   const features = [
