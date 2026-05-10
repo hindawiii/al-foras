@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, ShieldCheck, Brain, BadgeCheck, Clock, MapPin } from "lucide-react";
+import { ArrowRight, Sparkles, ShieldCheck, Brain, BadgeCheck, Clock, MapPin, Mail, Rocket, Target, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BrandMark } from "@/components/foras/Logo";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -14,6 +14,7 @@ const Landing = () => {
   const { user } = useAuth();
 
   const goApp = () => nav(user ? "/app" : "/auth");
+  const goAuth = () => nav("/auth");
   const featured = SCHOLARSHIPS.slice(0, 4);
 
   const features = [
@@ -22,8 +23,16 @@ const Landing = () => {
     { icon: Sparkles, title: t("landingFeature3Title"), body: t("landingFeature3Body") },
   ];
 
+  const whyCards = [
+    { icon: Rocket, title: t("landingWhy1Title"), body: t("landingWhy1Body") },
+    { icon: Target, title: t("landingWhy2Title"), body: t("landingWhy2Body") },
+    { icon: Database, title: t("landingWhy3Title"), body: t("landingWhy3Body") },
+  ];
+
+  const bodyFont = lang === "ar" ? "'Cairo', 'Tajawal', sans-serif" : "'Inter', system-ui, sans-serif";
+
   return (
-    <div dir={dir} className="relative min-h-screen bg-background text-foreground overflow-hidden">
+    <div dir={dir} className="relative min-h-screen bg-background text-foreground overflow-hidden" style={{ fontFamily: bodyFont }}>
       {/* Ambient gold glow */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-primary/15 blur-[140px]" />
@@ -40,7 +49,7 @@ const Landing = () => {
           >
             {lang === "ar" ? "EN" : "العربية"}
           </button>
-          <Button variant="ghostGold" size="sm" onClick={goApp}>
+          <Button variant="ghostGold" size="sm" onClick={goAuth}>
             {t("landingCtaSecondary")}
           </Button>
         </div>
@@ -91,7 +100,36 @@ const Landing = () => {
                 <f.icon className="w-5 h-5 text-primary" />
               </div>
               <h3 className="font-bold text-lg text-foreground mb-2">{f.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{f.body}</p>
+              <p className="text-sm text-gray-300 leading-relaxed">{f.body}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Why Al-Foras (About) */}
+      <section className="relative z-10 px-5 sm:px-10 py-16 max-w-6xl mx-auto">
+        <h2 className="font-display text-3xl sm:text-4xl font-bold text-center text-gold-gradient mb-10">
+          {t("landingWhyTitle")}
+        </h2>
+        <div className="grid sm:grid-cols-3 gap-5">
+          {whyCards.map((c, i) => (
+            <motion.div
+              key={c.title}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              whileHover={{ y: -6 }}
+              className="relative glass rounded-2xl p-7 border-primary/30 shadow-luxe overflow-hidden group"
+            >
+              <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-primary/10 blur-2xl group-hover:bg-primary/20 transition" />
+              <div className="relative">
+                <div className="w-14 h-14 rounded-2xl bg-gold-gradient flex items-center justify-center mb-5 shadow-gold">
+                  <c.icon className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <h3 className="font-display font-bold text-xl text-foreground mb-3">{c.title}</h3>
+                <p className="text-sm sm:text-base text-gray-300 leading-relaxed">{c.body}</p>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -126,8 +164,8 @@ const Landing = () => {
                     <span className="text-[10px] uppercase tracking-wider text-primary/80">{s.org}</span>
                   </div>
                   <h3 className="font-bold text-foreground line-clamp-1">{s.title}</h3>
-                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{s.description}</p>
-                  <div className="mt-3 flex flex-wrap gap-3 text-[11px] text-muted-foreground">
+                  <p className="text-xs text-gray-300 mt-1 line-clamp-2">{s.description}</p>
+                  <div className="mt-3 flex flex-wrap gap-3 text-[11px] text-gray-300">
                     <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3 text-primary" />{s.country}</span>
                     <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3 text-primary" />{s.deadline}</span>
                     <span className="text-primary font-semibold">{s.amount}</span>
@@ -146,8 +184,21 @@ const Landing = () => {
         </div>
       </section>
 
-      <footer className="relative z-10 px-5 py-8 text-center text-xs text-muted-foreground border-t border-primary/15">
-        {t("landingFooter")}
+      <footer className="relative z-10 px-5 py-12 border-t border-primary/15">
+        <div className="max-w-3xl mx-auto flex flex-col items-center gap-5 text-center">
+          <Button
+            variant="luxe"
+            size="lg"
+            asChild
+            className="min-w-[260px] glow-gold"
+          >
+            <a href="mailto:alforas.one@gmail.com">
+              <Mail className="w-5 h-5" />
+              {t("landingContactSupport")}
+            </a>
+          </Button>
+          <p className="text-xs text-gray-300">{t("landingFooter")}</p>
+        </div>
       </footer>
     </div>
   );
