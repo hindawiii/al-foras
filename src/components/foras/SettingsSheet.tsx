@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { nativeShare } from "@/lib/share";
 import { PrivacySecurityPage } from "@/components/foras/PrivacySecurityPage";
+import { AboutDialog } from "@/components/foras/AboutDialog";
 
 interface Props { open: boolean; onOpenChange: (v: boolean) => void; }
 
@@ -21,6 +22,7 @@ export const SettingsSheet = ({ open, onOpenChange }: Props) => {
   const { lang, dir, toggleLang, t } = useLanguage();
   const nav = useNavigate();
   const [view, setView] = useState<"main" | "privacy">("main");
+  const [aboutOpen, setAboutOpen] = useState(false);
   const isRtl = dir === "rtl";
   const alignClass = isRtl ? "text-right" : "text-left";
 
@@ -82,9 +84,7 @@ export const SettingsSheet = ({ open, onOpenChange }: Props) => {
           <Row icon={User} label={t("accountSettings")} align={alignClass} onClick={openProfile} />
           <Row icon={Shield} label={t("privacy")} align={alignClass} onClick={() => setView("privacy")} />
           <Row icon={Info} label={t("about")} align={alignClass}
-            onClick={() => toast.info(lang === "ar"
-              ? "الفرص v1.0 — منصة المنح والفرص العالمية"
-              : "Al-Foras v1.0 — Global scholarships & opportunities")} />
+            onClick={() => setAboutOpen(true)} />
           <Row icon={Trash2} label={t("clearCache")} align={alignClass} onClick={handleClearCache} />
 
           <div className="pt-4 space-y-2">
@@ -122,6 +122,7 @@ export const SettingsSheet = ({ open, onOpenChange }: Props) => {
           </div>
         </div>
         )}
+        <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} />
       </SheetContent>
     </Sheet>
   );

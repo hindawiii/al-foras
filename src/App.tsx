@@ -7,6 +7,7 @@ import { SettingsProvider } from "@/contexts/SettingsContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "./pages/Index";
 import AuthPage from "./pages/auth/AuthPage";
+import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ const App = () => (
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/landing" element={<Landing />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

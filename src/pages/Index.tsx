@@ -10,7 +10,7 @@ const Index = () => {
   const [onboarded, setOnboarded] = useState(() => localStorage.getItem("foras-onboarded") === "true");
 
   useEffect(() => {
-    if (!loading && !user) nav("/auth", { replace: true });
+    if (!loading && !user) nav("/landing", { replace: true });
   }, [loading, user, nav]);
 
   if (loading) {
