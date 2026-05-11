@@ -7,6 +7,30 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { SCHOLARSHIPS } from "@/lib/mockData";
 
+// Render Arabic text with diacritics (tashkeel) highlighted in a lighter gold/white,
+// and a soft glow on hover (when wrapped in a `group` element).
+const TashkeelText = ({ children, className = "" }: { children: string; className?: string }) => {
+  const chars = Array.from(children);
+  return (
+    <span className={className}>
+      {chars.map((ch, i) => {
+        const isHaraka = /[\u064B-\u0652\u0670]/.test(ch);
+        if (isHaraka) {
+          return (
+            <span
+              key={i}
+              className="text-white/95 transition-all duration-300 group-hover:text-primary-glow group-hover:[text-shadow:0_0_8px_hsl(var(--primary-glow)/0.9)]"
+            >
+              {ch}
+            </span>
+          );
+        }
+        return <span key={i}>{ch}</span>;
+      })}
+    </span>
+  );
+};
+
 const Landing = () => {
   const { t, dir, lang, toggleLang } = useLanguage();
   const isRtl = dir === "rtl";
@@ -83,8 +107,8 @@ const Landing = () => {
 
       {/* Features */}
       <section className="relative z-10 px-5 sm:px-10 py-16 max-w-6xl mx-auto">
-        <h2 className="font-display text-3xl sm:text-4xl font-bold text-center text-gold-gradient mb-10">
-          {t("landingFeaturesTitle")}
+        <h2 className="group font-arabic font-black tracking-tight text-3xl sm:text-4xl text-center text-gold-gradient mb-10 cursor-default">
+          <TashkeelText>{t("landingFeaturesTitle")}</TashkeelText>
         </h2>
         <div className="grid sm:grid-cols-3 gap-5">
           {features.map((f, i) => (
@@ -108,8 +132,8 @@ const Landing = () => {
 
       {/* Why Al-Foras (About) */}
       <section className="relative z-10 px-5 sm:px-10 py-16 max-w-6xl mx-auto">
-        <h2 className="font-display text-3xl sm:text-4xl font-bold text-center text-gold-gradient mb-10">
-          {t("landingWhyTitle")}
+        <h2 className="group font-arabic font-black tracking-tight text-3xl sm:text-4xl text-center text-gold-gradient mb-10 cursor-default">
+          <TashkeelText>{t("landingWhyTitle")}</TashkeelText>
         </h2>
         <div className="grid sm:grid-cols-3 gap-5">
           {whyCards.map((c, i) => (
@@ -186,17 +210,19 @@ const Landing = () => {
 
       <footer className="relative z-10 px-5 py-12 border-t border-primary/15">
         <div className="max-w-3xl mx-auto flex flex-col items-center gap-5 text-center">
-          <Button
-            variant="luxe"
-            size="lg"
-            asChild
-            className="min-w-[260px] glow-gold"
+          <a
+            href="mailto:alforas.one@gmail.com"
+            dir="ltr"
+            className="group inline-flex items-center gap-2.5 sm:gap-3 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full glass border border-primary/30 hover:border-primary/60 transition-all duration-300 shadow-luxe"
+            style={{ fontFamily: "'Cairo', system-ui, sans-serif" }}
           >
-            <a href="mailto:alforas.one@gmail.com">
-              <Mail className="w-5 h-5" />
-              {t("landingContactSupport")}
-            </a>
-          </Button>
+            <span className="w-7 h-7 rounded-full bg-primary/15 border border-primary/40 flex items-center justify-center">
+              <Mail className="w-3.5 h-3.5 text-primary" />
+            </span>
+            <span className="text-sm sm:text-base font-semibold text-foreground/90 tracking-wide transition-all duration-300 group-hover:text-primary group-hover:[text-shadow:0_0_10px_hsl(var(--primary-glow)/0.8)]">
+              alforas.one@gmail.com
+            </span>
+          </a>
           <p className="text-xs text-gray-300">{t("landingFooter")}</p>
         </div>
       </footer>
