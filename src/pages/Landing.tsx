@@ -65,7 +65,7 @@ const Landing = () => {
           <span className="inline-block px-4 py-1.5 rounded-full glass border-primary/30 text-xs tracking-[0.25em] text-primary uppercase mb-6">
             {t("landingTagline")}
           </span>
-          <h1 className="font-display text-5xl sm:text-7xl font-bold leading-tight">
+          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.25] sm:leading-tight">
             <span className="text-gold-gradient">{t("landingHeadline")}</span>
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
@@ -161,7 +161,7 @@ const Landing = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     {s.verified && <BadgeCheck className="w-4 h-4 text-[hsl(var(--verified))]" />}
-                    <span className="text-[10px] uppercase tracking-wider text-primary/80">{s.org}</span>
+                    <span className="text-sm sm:text-base font-bold tracking-wide text-primary">{s.org}</span>
                   </div>
                   <h3 className="font-bold text-foreground line-clamp-1">{s.title}</h3>
                   <p className="text-xs text-gray-300 mt-1 line-clamp-2">{s.description}</p>
