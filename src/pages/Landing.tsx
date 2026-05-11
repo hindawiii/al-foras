@@ -107,7 +107,7 @@ const Landing = () => {
 
       {/* Features */}
       <section className="relative z-10 px-5 sm:px-10 py-16 max-w-6xl mx-auto">
-        <h2 className="group font-arabic font-black tracking-tight text-3xl sm:text-4xl text-center text-gold-gradient mb-10 cursor-default">
+        <h2 className="group font-arabic font-black tracking-tight text-3xl sm:text-4xl text-center text-gold-gradient mb-10 cursor-default py-[5px]">
           <TashkeelText>{t("landingFeaturesTitle")}</TashkeelText>
         </h2>
         <div className="grid sm:grid-cols-3 gap-5">
@@ -132,7 +132,7 @@ const Landing = () => {
 
       {/* Why Al-Foras (About) */}
       <section className="relative z-10 px-5 sm:px-10 py-16 max-w-6xl mx-auto">
-        <h2 className="group font-arabic font-black tracking-tight text-3xl sm:text-4xl text-center text-gold-gradient mb-10 cursor-default">
+        <h2 className="group font-arabic font-black tracking-tight text-3xl sm:text-4xl text-center text-gold-gradient mb-10 cursor-default py-[5px]">
           <TashkeelText>{t("landingWhyTitle")}</TashkeelText>
         </h2>
         <div className="grid sm:grid-cols-3 gap-5">
