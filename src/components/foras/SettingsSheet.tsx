@@ -110,12 +110,14 @@ export const SettingsSheet = ({ open, onOpenChange }: Props) => {
                     {t("confirmLogoutDesc")}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter className={isRtl ? "flex-row-reverse" : ""}>
+                <AlertDialogFooter className={`gap-2 ${isRtl ? "flex-row-reverse" : ""}`}>
                   <AlertDialogAction onClick={handleLogout}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    className="flex-1 rounded-full bg-transparent border border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors">
                     {t("yesLogout")}
                   </AlertDialogAction>
-                  <AlertDialogCancel className="bg-card border-gold/30">{t("cancel")}</AlertDialogCancel>
+                  <AlertDialogCancel className="flex-1 mt-0 rounded-full bg-transparent border border-primary/50 text-primary hover:bg-primary/10 hover:text-primary transition-colors">
+                    {t("cancel")}
+                  </AlertDialogCancel>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
