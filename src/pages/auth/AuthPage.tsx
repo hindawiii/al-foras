@@ -86,7 +86,7 @@ export default function AuthPage() {
       <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-primary-deep/20 rounded-full blur-3xl" />
 
       <div className="p-6 flex justify-center relative z-10">
-        <BrandMark />
+        <BrandMark size={72} />
       </div>
 
       <div className="flex-1 flex items-center justify-center px-6 pb-10 relative z-10">
