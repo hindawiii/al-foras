@@ -125,7 +125,7 @@ export const ScholarshipCard = ({ scholarship, onSwipe, onTap, active, index, ma
 
           {/* Title block */}
           <div className={`${isRtl ? "text-right" : "text-left"} mb-4`}>
-            <p className="text-primary text-sm sm:text-base font-bold mb-1">{scholarship.org}</p>
+            <p className="text-primary text-sm sm:text-base font-extrabold mb-1">{scholarship.org}</p>
             <h3 className="font-display text-2xl text-foreground leading-tight line-clamp-3">
               {scholarship.title}
             </h3>
