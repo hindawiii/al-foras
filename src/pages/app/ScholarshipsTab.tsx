@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { ExternalLink, BadgeCheck, Search, Award, MapPin, Clock, Link2, Share2, Sparkles, Globe, Star } from "lucide-react";
 import { ScholarshipCard } from "@/components/foras/ScholarshipCard";
-import { InAppBrowser } from "@/components/foras/InAppBrowser";
 import { SCHOLARSHIPS, Scholarship, computeMatchScore } from "@/lib/mockData";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -35,8 +34,6 @@ export const ScholarshipsTab = () => {
 
   const [deck, setDeck] = useState<Scholarship[]>(orderedDeck);
   const [detail, setDetail] = useState<Scholarship | null>(null);
-  const [browserUrl, setBrowserUrl] = useState<string | null>(null);
-  const [browserTitle, setBrowserTitle] = useState<string | undefined>();
   const [aiNotice, setAiNotice] = useState(false);
   const [profile, setProfile] = useState<{ location?: string; skills?: string[]; interests?: string[] }>({});
   const { user } = useAuth();
@@ -219,14 +216,16 @@ export const ScholarshipsTab = () => {
                 </div>
 
                 <div className="grid grid-cols-1 gap-2 pt-2">
-                  <Button variant="luxe" size="lg" className="w-full"
-                    onClick={() => {
-                      setBrowserUrl(detail.officialUrl);
-                      setBrowserTitle(detail.title);
-                      setDetail(null);
-                    }}>
-                    <ExternalLink className={`w-4 h-4 ${isRtl ? "ml-2" : "mr-2"}`} />
-                    {t("applyOfficial")}
+                  <Button asChild variant="luxe" size="lg" className="w-full">
+                    <a
+                      href={detail.officialUrl}
+                      target="_blank"
+                      rel="noopener noreferrer external"
+                      onClick={() => setDetail(null)}
+                    >
+                      <ExternalLink className={`w-4 h-4 ${isRtl ? "ml-2" : "mr-2"}`} />
+                      {t("applyOfficial")}
+                    </a>
                   </Button>
                   <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
                     {t("applyOfficialNote")}
@@ -247,8 +246,6 @@ export const ScholarshipsTab = () => {
           )}
         </SheetContent>
       </Sheet>
-
-      <InAppBrowser url={browserUrl} title={browserTitle} onClose={() => setBrowserUrl(null)} />
     </div>
   );
 };
