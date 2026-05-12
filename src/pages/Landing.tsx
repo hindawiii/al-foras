@@ -44,7 +44,6 @@ const Landing = () => {
   const features = [
     { icon: Brain, title: t("landingFeature1Title"), body: t("landingFeature1Body") },
     { icon: ShieldCheck, title: t("landingFeature2Title"), body: t("landingFeature2Body") },
-    { icon: Sparkles, title: t("landingFeature3Title"), body: t("landingFeature3Body") },
   ];
 
   const whyCards = [
@@ -110,7 +109,7 @@ const Landing = () => {
         <h2 className="group font-arabic font-black tracking-tight text-3xl sm:text-4xl text-center text-gold-gradient mb-10 cursor-default py-[8px]">
           <TashkeelText>{t("landingFeaturesTitle")}</TashkeelText>
         </h2>
-        <div className="grid sm:grid-cols-3 gap-5">
+        <div className="grid sm:grid-cols-2 gap-5">
           {features.map((f, i) => (
             <motion.div
               key={f.title}
