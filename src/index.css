@@ -25,7 +25,7 @@
     --secondary-foreground: 0 0% 100%;
 
     --muted: 0 0% 7%;
-    --muted-foreground: 0 0% 63%;     /* #A0A0A0 */
+   --muted-foreground: 220 13% 84%;  /* #D1D5DB — eye-comfort dark mode body text */
 
     --accent: 43 74% 38%;
     --accent-foreground: 0 0% 6%;
