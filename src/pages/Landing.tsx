@@ -64,7 +64,7 @@ const Landing = () => {
 
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-5 sm:px-10 py-5">
-        <BrandMark size={64} />
+        <BrandMark size={82} />
         <div className="flex items-center gap-2">
           <button
             onClick={toggleLang}
@@ -209,7 +209,7 @@ const Landing = () => {
 
       <footer className="relative z-10 px-5 py-12 border-t border-primary/15">
         <div className="max-w-3xl mx-auto flex flex-col items-center gap-5 text-center">
-          <BrandMark size={72} />
+          <BrandMark size={92} />
           <a
             href="mailto:alforas.one@gmail.com"
             dir="ltr"
