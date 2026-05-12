@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Save, Plus, X, GraduationCap, MapPin, Mail, User as UserIcon, Edit3, Sparkles, Check } from "lucide-react";
+import { Save, Plus, X, GraduationCap, MapPin, Mail, User as UserIcon, Edit3, Sparkles, Check, Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,11 +13,11 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useSettings } from "@/contexts/SettingsContext";
 
 interface ProfileState {
-  full_name: string; bio: string; education: string; location: string;
+  full_name: string; bio: string; education: string; location: string; avatar_url: string;
   skills: string[]; interests: string[];
 }
 
-const empty: ProfileState = { full_name: "", bio: "", education: "", location: "", skills: [], interests: [] };
+const empty: ProfileState = { full_name: "", bio: "", education: "", location: "", avatar_url: "", skills: [], interests: [] };
 
 export const ProfileTab = () => {
   const { user } = useAuth();
@@ -31,6 +31,7 @@ export const ProfileTab = () => {
   const [skillInput, setSkillInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -40,6 +41,7 @@ export const ProfileTab = () => {
           const p: ProfileState = {
             full_name: data.full_name ?? "", bio: data.bio ?? "",
             education: data.education ?? "", location: data.location ?? "",
+            avatar_url: data.avatar_url ?? "",
             skills: data.skills ?? [], interests: (data as any).interests ?? [],
           };
           setProfile(p); setDraft(p);
@@ -59,6 +61,29 @@ export const ProfileTab = () => {
 
   const startEdit = () => { setDraft(profile); setEditing(true); };
   const cancelEdit = () => { setDraft(profile); setEditing(false); };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !user) return;
+    if (!file.type.startsWith("image/")) { toast.error("الرجاء اختيار صورة"); return; }
+    if (file.size > 4 * 1024 * 1024) { toast.error("الصورة أكبر من 4 ميجابايت"); return; }
+    setUploading(true);
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, {
+      cacheControl: "3600", upsert: true, contentType: file.type,
+    });
+    if (upErr) { setUploading(false); toast.error("تعذر رفع الصورة"); return; }
+    const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+    const url = pub.publicUrl;
+    const { error: dbErr } = await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
+    setUploading(false);
+    if (dbErr) { toast.error("تعذر حفظ الصورة"); return; }
+    setProfile(p => ({ ...p, avatar_url: url }));
+    setDraft(d => ({ ...d, avatar_url: url }));
+    toast.success("تم تحديث صورتك");
+  };
 
   const save = async () => {
     if (!user) return;
@@ -88,68 +113,120 @@ export const ProfileTab = () => {
 
   if (loading) return <div className="text-center text-muted-foreground py-20">{t("loading")}</div>;
 
-  // ===== ID Card View =====
+  // ===== Profile Dashboard View =====
   if (!editing) {
+    const initial = (profile.full_name || user?.email || "?")[0].toUpperCase();
+    // Circular progress ring math
+    const size = 140;
+    const stroke = 6;
+    const radius = (size - stroke) / 2;
+    const circumference = 2 * Math.PI * radius;
+    const dashOffset = circumference * (1 - completion / 100);
+
     return (
       <div className="space-y-4 pb-24">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          className="relative bg-card-gradient border-gold border-2 rounded-3xl p-6 shadow-luxe overflow-hidden">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary-glow/10 rounded-full blur-3xl" />
+        {/* === Panoramic Gold Dashboard Hero === */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          className="relative rounded-3xl overflow-hidden border border-primary/30 shadow-luxe"
+        >
+          {/* Panoramic faint-gold backdrop */}
+          <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_0%,hsl(var(--primary)/0.28),transparent_60%),linear-gradient(180deg,hsl(var(--primary)/0.10),hsl(var(--card)))]" />
+          <div className="absolute -top-20 -right-16 w-72 h-72 bg-primary/15 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -left-16 w-72 h-72 bg-primary-glow/10 rounded-full blur-3xl" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gold-gradient opacity-70" />
 
-          <div className="relative flex items-center justify-between mb-4">
-            <span className="text-[10px] tracking-widest text-primary font-bold">{t("idCard")}</span>
-            <button onClick={startEdit}
-              className="flex items-center gap-1.5 text-xs bg-primary/10 border border-primary/30 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-full">
-              <Edit3 className="w-3 h-3" /> {t("edit")}
-            </button>
-          </div>
+          {/* Edit pill (top-start) */}
+          <button onClick={startEdit}
+            className="absolute top-4 start-4 z-10 flex items-center gap-1.5 text-xs bg-background/60 backdrop-blur-md border border-primary/30 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-full">
+            <Edit3 className="w-3 h-3" /> {t("edit")}
+          </button>
 
-          <div className="relative flex gap-4 items-center mb-5">
-            <div className="w-20 h-20 rounded-2xl bg-gold-gradient flex items-center justify-center text-3xl font-display text-primary-foreground shadow-gold flex-shrink-0">
-              {(profile.full_name || user?.email || "?")[0].toUpperCase()}
+          <div className="relative px-6 pt-10 pb-6 flex flex-col items-center text-center">
+            {/* Avatar with progress ring */}
+            <div className="relative" style={{ width: size, height: size }}>
+              <svg width={size} height={size} className="absolute inset-0 -rotate-90">
+                <defs>
+                  <linearGradient id="goldRing" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="hsl(var(--primary-glow))" />
+                    <stop offset="50%" stopColor="hsl(var(--primary))" />
+                    <stop offset="100%" stopColor="hsl(var(--primary-deep))" />
+                  </linearGradient>
+                </defs>
+                <circle cx={size/2} cy={size/2} r={radius} fill="none"
+                  stroke="hsl(var(--border))" strokeWidth={stroke} opacity={0.4} />
+                <motion.circle
+                  cx={size/2} cy={size/2} r={radius} fill="none"
+                  stroke="url(#goldRing)" strokeWidth={stroke} strokeLinecap="round"
+                  strokeDasharray={circumference}
+                  initial={{ strokeDashoffset: circumference }}
+                  animate={{ strokeDashoffset: dashOffset }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                  style={{ filter: "drop-shadow(0 0 8px hsl(var(--primary)/0.6))" }}
+                />
+              </svg>
+
+              <div className="absolute inset-[10px] rounded-full bg-card overflow-hidden border border-primary/30 flex items-center justify-center">
+                {profile.avatar_url && !hideProfile ? (
+                  <img src={profile.avatar_url} alt="avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gold-gradient flex items-center justify-center font-display text-4xl text-primary-foreground">
+                    {hideProfile ? "•" : initial}
+                  </div>
+                )}
+              </div>
+
+              {/* Upload button */}
+              <label className="absolute bottom-1 end-1 w-9 h-9 rounded-full bg-gold-gradient border-2 border-background flex items-center justify-center shadow-gold cursor-pointer hover:scale-105 transition-transform">
+                {uploading
+                  ? <Loader2 className="w-4 h-4 text-primary-foreground animate-spin" />
+                  : <Camera className="w-4 h-4 text-primary-foreground" />}
+                <input type="file" accept="image/*" className="hidden"
+                  onChange={handleAvatarUpload} disabled={uploading} />
+              </label>
+
+              {/* Completion % chip */}
+              <div className="absolute -bottom-2 start-1/2 -translate-x-1/2 translate-y-full">
+                <span className="text-[10px] font-bold text-primary bg-background/80 backdrop-blur-md border border-primary/30 px-2 py-0.5 rounded-full whitespace-nowrap">
+                  {completion}% {t("profileCompletion")}
+                </span>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="font-display text-xl text-gold-gradient truncate">
-                {hideProfile ? "•••••" : (profile.full_name || t("yourFullName"))}
-              </h2>
-              <p className="text-xs text-muted-foreground truncate flex items-center gap-1 mt-0.5" dir="ltr">
-                <Mail className="w-3 h-3" /> {hideProfile ? "•••••@•••••" : user?.email}
+
+            <h2 className="font-display text-2xl text-gold-gradient mt-8 truncate max-w-full">
+              {hideProfile ? "•••••" : (profile.full_name || t("yourFullName"))}
+            </h2>
+            <p className="text-sm text-gold-gradient/90 truncate max-w-full flex items-center gap-1 mt-1 justify-center" dir="ltr">
+              <Mail className="w-3.5 h-3.5 text-primary" />
+              <span className="text-primary/90 font-medium">
+                {hideProfile ? "•••••@•••••" : user?.email}
+              </span>
+            </p>
+            {profile.location && !hideProfile && (
+              <p className="text-xs text-foreground flex items-center gap-1 mt-2">
+                <MapPin className="w-3 h-3 text-primary" /> {profile.location}
               </p>
-              {profile.location && !hideProfile && (
-                <p className="text-xs text-foreground flex items-center gap-1 mt-1">
-                  <MapPin className="w-3 h-3 text-primary" /> {profile.location}
-                </p>
-              )}
-            </div>
-          </div>
+            )}
 
-          <div className="relative bg-background/40 border border-border rounded-xl p-3 mb-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-muted-foreground">{t("profileCompletion")}</span>
-              <span className="text-sm font-bold text-primary">{completion}%</span>
-            </div>
-            <div className="h-2 bg-background rounded-full overflow-hidden">
-              <motion.div initial={{ width: 0 }} animate={{ width: `${completion}%` }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="h-full bg-gold-gradient" />
-            </div>
             {completion < 100 && (
-              <p className="text-[10px] text-muted-foreground mt-2">
+              <p className="text-[11px] text-muted-foreground mt-3 max-w-xs">
                 {t("completeProfileHint")}
               </p>
             )}
           </div>
+        </motion.div>
 
+        {/* === Detail panels === */}
+        <div className="space-y-3">
           {profile.bio && !hideProfile && (
-            <div className="relative bg-background/40 border border-border rounded-xl p-3 mb-3">
+            <div className="bg-card-gradient border border-border rounded-2xl p-4">
               <p className="text-[10px] text-primary mb-1 font-bold">{t("bio")}</p>
               <p className="text-sm text-foreground leading-relaxed">{profile.bio}</p>
             </div>
           )}
 
           {profile.education && !hideProfile && (
-            <div className="relative bg-background/40 border border-border rounded-xl p-3 mb-3">
+            <div className="bg-card-gradient border border-border rounded-2xl p-4">
               <p className="text-[10px] text-primary mb-1 font-bold flex items-center gap-1">
                 <GraduationCap className="w-3 h-3" /> {t("education")}
               </p>
@@ -158,7 +235,7 @@ export const ProfileTab = () => {
           )}
 
           {profile.interests.length > 0 && !hideProfile && (
-            <div className="relative bg-background/40 border border-border rounded-xl p-3 mb-3">
+            <div className="bg-card-gradient border border-border rounded-2xl p-4">
               <p className="text-[10px] text-primary mb-2 font-bold flex items-center gap-1">
                 <Sparkles className="w-3 h-3" /> {t("interests")}
               </p>
@@ -173,7 +250,7 @@ export const ProfileTab = () => {
           )}
 
           {profile.skills.length > 0 && !hideProfile && (
-            <div className="relative bg-background/40 border border-border rounded-xl p-3">
+            <div className="bg-card-gradient border border-border rounded-2xl p-4">
               <p className="text-[10px] text-primary mb-2 font-bold">{t("skills")}</p>
               <div className="flex flex-wrap gap-1.5">
                 {profile.skills.map(s => (
@@ -184,7 +261,7 @@ export const ProfileTab = () => {
               </div>
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
     );
   }
