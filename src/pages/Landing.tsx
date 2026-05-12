@@ -86,7 +86,7 @@ const Landing = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <span className="inline-block px-4 py-1.5 rounded-full glass border-primary/30 text-xs tracking-[0.25em] text-primary uppercase mb-6">
+          <span className="inline-block px-4 py-1.5 rounded-full glass border-primary/30 tracking-[0.25em] text-primary uppercase mb-6 text-base">
             {t("landingTagline")}
           </span>
           <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.25] sm:leading-tight">
@@ -107,7 +107,7 @@ const Landing = () => {
 
       {/* Features */}
       <section className="relative z-10 px-5 sm:px-10 py-16 max-w-6xl mx-auto">
-        <h2 className="group font-arabic font-black tracking-tight text-3xl sm:text-4xl text-center text-gold-gradient mb-10 cursor-default py-[5px]">
+        <h2 className="group font-arabic font-black tracking-tight text-3xl sm:text-4xl text-center text-gold-gradient mb-10 cursor-default py-[8px]">
           <TashkeelText>{t("landingFeaturesTitle")}</TashkeelText>
         </h2>
         <div className="grid sm:grid-cols-3 gap-5">
@@ -132,7 +132,7 @@ const Landing = () => {
 
       {/* Why Al-Foras (About) */}
       <section className="relative z-10 px-5 sm:px-10 py-16 max-w-6xl mx-auto">
-        <h2 className="group font-arabic font-black tracking-tight text-3xl sm:text-4xl text-center text-gold-gradient mb-10 cursor-default py-[5px]">
+        <h2 className="group font-arabic font-black tracking-tight text-3xl sm:text-4xl text-center text-gold-gradient mb-10 cursor-default py-[8px]">
           <TashkeelText>{t("landingWhyTitle")}</TashkeelText>
         </h2>
         <div className="grid sm:grid-cols-3 gap-5">
