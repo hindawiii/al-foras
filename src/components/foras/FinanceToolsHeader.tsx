@@ -33,8 +33,8 @@ export const FinanceToolsHeader = () => {
   const w = parseFloat(grams) || 0;
 
   return (
-    <div className="sticky top-[72px] z-20 -mx-1 px-1 pb-2 bg-background/85 backdrop-blur-xl border-b border-primary/10">
-      <div className="rounded-2xl border border-primary/30 bg-card-gradient p-3 shadow-luxe max-h-[60vh] overflow-y-auto" dir="rtl">
+    <div className="pb-2">
+      <div className="rounded-2xl border border-primary/30 bg-card-gradient p-3 shadow-luxe" dir="rtl">
         <Tabs defaultValue="currency">
           <TabsList className="grid grid-cols-2 w-full bg-input border border-primary/20 h-9">
             <TabsTrigger value="currency" className="data-[state=active]:bg-gold-gradient data-[state=active]:text-primary-foreground gap-1.5 text-xs h-7">
