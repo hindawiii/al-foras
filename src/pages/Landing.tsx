@@ -209,7 +209,7 @@ const Landing = () => {
 
       <footer className="relative z-10 px-5 py-12 border-t border-primary/15">
         <div className="max-w-3xl mx-auto flex flex-col items-center gap-5 text-center">
-          <BrandMark size={92} />
+          <BrandMark size={184} />
           <a
             href="mailto:alforas.one@gmail.com"
             dir="ltr"
