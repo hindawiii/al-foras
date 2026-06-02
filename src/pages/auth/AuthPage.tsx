@@ -95,7 +95,7 @@ export default function AuthPage() {
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md"
         >
-          <div className="glass rounded-3xl p-8 shadow-luxe text-right" dir="rtl">
+          <div className="glass p-8 shadow-luxe text-right rounded-lg" dir="rtl">
             <AnimatePresence mode="wait">
               <motion.div
                 key={mode}
