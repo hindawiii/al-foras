@@ -170,7 +170,7 @@ export const ScholarshipsTab = () => {
         )}
       </div>
 
-      <p className="text-center text-muted-foreground pt-3 text-sm my-[10px]">
+      <p className="text-center text-muted-foreground pt-3 my-[10px] text-xs">
         {t("swipeHint")}
       </p>
 
