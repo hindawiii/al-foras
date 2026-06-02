@@ -44,7 +44,7 @@ export const AppShell = () => {
     <div className="min-h-screen bg-background relative">
       {/* Top bar */}
       <header className="sticky top-0 z-30 glass border-b border-primary/10">
-        <div className="max-w-2xl mx-auto flex justify-between items-center py-0 px-[5px] gap-0">
+        <div className="max-w-2xl mx-auto flex justify-between items-center py-0 px-[5px] gap-0 pl-[5px] pr-0">
           <BrandMark size={100} />
           <div className="flex items-center gap-2">
             <button onClick={toggleLang}
