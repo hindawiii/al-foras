@@ -85,7 +85,7 @@ export default function AuthPage() {
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
       <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-primary-deep/20 rounded-full blur-3xl" />
 
-      <div className="p-6 flex justify-center relative z-10">
+      <div className="p-6 flex justify-center relative z-10 px-[100px] py-0 pr-[100px] pt-0">
         <BrandMark size={72} />
       </div>
 
@@ -104,12 +104,12 @@ export default function AuthPage() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.25 }}
               >
-                <h1 className="font-display text-3xl text-gold-gradient mb-2 text-right">
+                <h1 className="font-display text-3xl text-gold-gradient mb-2 text-center">
                   {mode === "login" && "تسجيل الدخول"}
                   {mode === "signup" && "إنشاء حساب جديد"}
                   {mode === "forgot" && "استعادة كلمة المرور"}
                 </h1>
-                <p className="text-muted-foreground text-sm mb-8 text-right">
+                <p className="text-muted-foreground text-sm mb-8 text-center">
                   {mode === "login" && "أهلاً بك مجدداً في الفرص"}
                   {mode === "signup" && "ابدأ رحلتك نحو فرصتك القادمة"}
                   {mode === "forgot" && "أدخل بريدك وسنرسل لك رابط الاستعادة"}
