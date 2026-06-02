@@ -45,7 +45,7 @@ export const AppShell = () => {
       {/* Top bar */}
       <header className="sticky top-0 z-30 glass border-b border-primary/10">
         <div className="max-w-2xl mx-auto flex justify-between items-center py-0 px-[5px] gap-0">
-          <BrandMark size={100} />
+          <BrandMark size={200} />
           <div className="flex items-center gap-2">
             <button onClick={toggleLang}
               className="h-11 px-3 rounded-xl bg-card border border-primary/20 hover:border-primary hover:bg-primary/10 transition-all flex items-center gap-1.5"
