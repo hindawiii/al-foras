@@ -185,26 +185,25 @@ export const ProfileTab = () => {
                   onChange={handleAvatarUpload} disabled={uploading} />
               </label>
 
-              {/* Completion % chip */}
-              <div className="absolute -bottom-2 start-1/2 -translate-x-1/2 translate-y-full">
-                <span className="text-[10px] font-bold text-primary bg-background/80 backdrop-blur-md border border-primary/30 px-2 py-0.5 rounded-full whitespace-nowrap">
-                  {completion}% {t("profileCompletion")}
-                </span>
-              </div>
             </div>
 
-            <h2 className="font-display text-2xl text-gold-gradient mt-8 truncate max-w-full">
+            {/* Completion label under the ring */}
+            <p className="text-xs font-bold text-primary mt-4 tracking-wide">
+              {completion}% {t("profileCompletion")}
+            </p>
+
+            <h2 className="font-display text-3xl font-bold text-gold-gradient mt-3 truncate max-w-full">
               {hideProfile ? "•••••" : (profile.full_name || t("yourFullName"))}
             </h2>
-            <p className="text-sm text-gold-gradient/90 truncate max-w-full flex items-center gap-1 mt-1 justify-center" dir="ltr">
-              <Mail className="w-3.5 h-3.5 text-primary" />
-              <span className="text-primary/90 font-medium">
+            <p className="text-base font-semibold text-gold-gradient/90 truncate max-w-full flex items-center gap-1.5 mt-2 justify-center" dir="ltr">
+              <Mail className="w-4 h-4 text-primary" />
+              <span className="text-primary font-semibold">
                 {hideProfile ? "•••••@•••••" : user?.email}
               </span>
             </p>
             {profile.location && !hideProfile && (
-              <p className="text-xs text-foreground flex items-center gap-1 mt-2">
-                <MapPin className="w-3 h-3 text-primary" /> {profile.location}
+              <p className="text-base font-semibold text-foreground flex items-center gap-1.5 mt-2">
+                <MapPin className="w-4 h-4 text-primary" /> {profile.location}
               </p>
             )}
 
