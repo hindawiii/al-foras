@@ -29,6 +29,7 @@ export default function AuthPage() {
   const [name, setName] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [showResend, setShowResend] = useState(false);
 
   const handleGoogle = async () => {
     setBusy(true);
@@ -82,7 +83,10 @@ export default function AuthPage() {
           console.error("[auth] signIn error:", error);
           const m = error.message || "";
           if (m.includes("Invalid login credentials")) toast.error("البريد أو كلمة المرور غير صحيحة");
-          else if (m.includes("Email not confirmed")) toast.error("لم يتم تأكيد البريد الإلكتروني. تحقق من صندوق الوارد");
+          else if (m.includes("Email not confirmed")) {
+            toast.error("لم يتم تأكيد البريد. اضغط 'إعادة إرسال التأكيد' أدناه", { duration: 6000 });
+            setShowResend(true);
+          }
           else if (m.toLowerCase().includes("too many")) toast.error("محاولات كثيرة، انتظر دقيقة وحاول مجدداً");
           else if (m.toLowerCase().includes("network") || m.toLowerCase().includes("fetch")) toast.error("تعذر الاتصال بالخادم، تحقق من الإنترنت");
           else toast.error(`فشل تسجيل الدخول: ${m}`);
@@ -114,6 +118,25 @@ export default function AuthPage() {
         toast.success("تم إرسال رابط استعادة كلمة المرور إلى بريدك");
         setMode("login");
       }
+    } finally { setBusy(false); }
+  };
+
+  const handleResendConfirmation = async () => {
+    try { emailSchema.parse(email); } catch (err) {
+      if (err instanceof z.ZodError) { toast.error(err.errors[0].message); return; }
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup", email,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
+      });
+      if (error) {
+        console.error("[auth] resend error:", error);
+        toast.error(`تعذر إعادة الإرسال: ${error.message}`);
+        return;
+      }
+      toast.success("تم إعادة إرسال رابط التأكيد إلى بريدك");
     } finally { setBusy(false); }
   };
 
@@ -198,6 +221,14 @@ export default function AuthPage() {
                         </div>
                       )}
                     </div>
+                  )}
+
+                  {mode === "login" && showResend && (
+                    <Button type="button" variant="ghost" size="sm"
+                      onClick={handleResendConfirmation} disabled={busy}
+                      className="w-full text-primary hover:text-primary">
+                      إعادة إرسال رابط التأكيد
+                    </Button>
                   )}
 
                   <Button type="submit" variant="luxe" size="lg" className="w-full" disabled={busy}>
