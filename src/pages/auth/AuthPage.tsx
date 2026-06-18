@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User as UserIcon, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User as UserIcon, ArrowLeft, Sparkles } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +37,30 @@ export default function AuthPage() {
       if (r.error) { toast.error("تعذر تسجيل الدخول عبر جوجل"); return; }
       if (r.redirected) return;
       nav("/");
+    } finally { setBusy(false); }
+  };
+
+  const handleMagicLink = async () => {
+    try {
+      emailSchema.parse(email);
+    } catch (err) {
+      if (err instanceof z.ZodError) { toast.error(err.errors[0].message); return; }
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
+      });
+      if (error) {
+        console.error("[auth] magic link error:", error);
+        const m = error.message || "";
+        if (m.toLowerCase().includes("too many") || m.toLowerCase().includes("rate"))
+          toast.error("محاولات كثيرة، انتظر دقيقة وحاول مجدداً");
+        else toast.error(`تعذر إرسال الرابط: ${m}`);
+        return;
+      }
+      toast.success("تم إرسال رابط الدخول إلى بريدك");
     } finally { setBusy(false); }
   };
 
@@ -196,6 +220,14 @@ export default function AuthPage() {
                       <GoogleIcon />
                       <span className="mr-2">المتابعة عبر جوجل</span>
                     </Button>
+                    {mode === "login" && (
+                      <Button type="button" variant="outline" size="lg"
+                        onClick={handleMagicLink} disabled={busy || !email}
+                        className="w-full mt-3 bg-card border-gold/30 hover:bg-primary/10 hover:border-primary">
+                        <Sparkles className="w-5 h-5" />
+                        <span className="mr-2">متابعة عبر البريد (رابط سحري)</span>
+                      </Button>
+                    )}
                   </>
                 )}
 
