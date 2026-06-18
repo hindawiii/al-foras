@@ -69,17 +69,27 @@ export const ProfileTab = () => {
     if (!file.type.startsWith("image/")) { toast.error("الرجاء اختيار صورة"); return; }
     if (file.size > 4 * 1024 * 1024) { toast.error("الصورة أكبر من 4 ميجابايت"); return; }
     setUploading(true);
-    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const rawExt = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const ext = /^[a-z0-9]{1,5}$/.test(rawExt) ? rawExt : "jpg";
     const path = `${user.id}/avatar-${Date.now()}.${ext}`;
     const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, {
-      cacheControl: "3600", upsert: true, contentType: file.type,
+      cacheControl: "3600", upsert: true, contentType: file.type || "image/jpeg",
     });
-    if (upErr) { setUploading(false); toast.error("تعذر رفع الصورة"); return; }
+    if (upErr) {
+      console.error("Avatar upload error:", upErr);
+      setUploading(false);
+      toast.error(`تعذر رفع الصورة: ${upErr.message}`);
+      return;
+    }
     const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
     const url = pub.publicUrl;
     const { error: dbErr } = await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
     setUploading(false);
-    if (dbErr) { toast.error("تعذر حفظ الصورة"); return; }
+    if (dbErr) {
+      console.error("Avatar DB update error:", dbErr);
+      toast.error(`تعذر حفظ الصورة: ${dbErr.message}`);
+      return;
+    }
     setProfile(p => ({ ...p, avatar_url: url }));
     setDraft(d => ({ ...d, avatar_url: url }));
     toast.success("تم تحديث صورتك");
