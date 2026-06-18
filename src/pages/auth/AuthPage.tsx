@@ -54,7 +54,16 @@ export default function AuthPage() {
     try {
       if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) { toast.error(error.message.includes("Invalid") ? "بيانات الدخول غير صحيحة" : "فشل تسجيل الدخول"); return; }
+        if (error) {
+          console.error("[auth] signIn error:", error);
+          const m = error.message || "";
+          if (m.includes("Invalid login credentials")) toast.error("البريد أو كلمة المرور غير صحيحة");
+          else if (m.includes("Email not confirmed")) toast.error("لم يتم تأكيد البريد الإلكتروني. تحقق من صندوق الوارد");
+          else if (m.toLowerCase().includes("too many")) toast.error("محاولات كثيرة، انتظر دقيقة وحاول مجدداً");
+          else if (m.toLowerCase().includes("network") || m.toLowerCase().includes("fetch")) toast.error("تعذر الاتصال بالخادم، تحقق من الإنترنت");
+          else toast.error(`فشل تسجيل الدخول: ${m}`);
+          return;
+        }
         toast.success("مرحباً بعودتك");
         nav("/");
       } else if (mode === "signup") {
@@ -63,8 +72,12 @@ export default function AuthPage() {
           options: { emailRedirectTo: window.location.origin, data: { full_name: name } }
         });
         if (error) {
-          if (error.message.includes("registered")) toast.error("هذا البريد مسجل مسبقاً");
-          else toast.error("فشل إنشاء الحساب");
+          console.error("[auth] signUp error:", error);
+          const m = error.message || "";
+          if (m.includes("already registered") || m.includes("User already")) toast.error("هذا البريد مسجل مسبقاً");
+          else if (m.toLowerCase().includes("pwned") || m.toLowerCase().includes("compromised") || m.toLowerCase().includes("leaked")) toast.error("كلمة المرور هذه مسربة في خرق بيانات معروف، اختر كلمة أقوى");
+          else if (m.toLowerCase().includes("password")) toast.error(`كلمة المرور ضعيفة: ${m}`);
+          else toast.error(`فشل إنشاء الحساب: ${m}`);
           return;
         }
         toast.success("تم إنشاء حسابك بنجاح");
@@ -73,7 +86,7 @@ export default function AuthPage() {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`
         });
-        if (error) { toast.error("تعذر إرسال رابط الاستعادة"); return; }
+        if (error) { console.error("[auth] reset error:", error); toast.error(`تعذر إرسال رابط الاستعادة: ${error.message}`); return; }
         toast.success("تم إرسال رابط استعادة كلمة المرور إلى بريدك");
         setMode("login");
       }
