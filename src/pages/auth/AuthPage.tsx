@@ -29,6 +29,7 @@ export default function AuthPage() {
   const [name, setName] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [showResend, setShowResend] = useState(false);
 
   const handleGoogle = async () => {
     setBusy(true);
@@ -220,6 +221,14 @@ export default function AuthPage() {
                         </div>
                       )}
                     </div>
+                  )}
+
+                  {mode === "login" && showResend && (
+                    <Button type="button" variant="ghost" size="sm"
+                      onClick={handleResendConfirmation} disabled={busy}
+                      className="w-full text-primary hover:text-primary">
+                      إعادة إرسال رابط التأكيد
+                    </Button>
                   )}
 
                   <Button type="submit" variant="luxe" size="lg" className="w-full" disabled={busy}>
