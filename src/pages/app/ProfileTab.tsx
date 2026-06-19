@@ -155,7 +155,7 @@ export const ProfileTab = () => {
 
   // ===== Profile Dashboard View =====
   if (!editing) {
-    const initial = (profile.full_name || user?.email || "?")[0].toUpperCase();
+    const initial = (profile.full_name || user?.email || "ض")[0].toUpperCase();
     // Circular progress ring math
     const size = 140;
     const stroke = 6;
@@ -238,9 +238,14 @@ export const ProfileTab = () => {
             <p className="text-base font-semibold text-gold-gradient/90 truncate max-w-full flex items-center gap-1.5 mt-2 justify-center" dir="ltr">
               <Mail className="w-4 h-4 text-primary" />
               <span className="text-primary font-semibold">
-                {hideProfile ? "•••••@•••••" : user?.email}
+                {hideProfile ? "•••••@•••••" : (user?.email || "👤 ضيف")}
               </span>
             </p>
+            {isGuest && !hideProfile && (
+              <div className="mt-3 px-4 py-2 rounded-xl bg-primary/10 border border-primary/30 text-xs text-primary max-w-sm">
+                👋 أنت تستخدم التطبيق كضيف — سنضيف تسجيل الدخول قريبًا لحفظ بياناتك على السحابة.
+              </div>
+            )}
             {profile.location && !hideProfile && (
               <p className="text-base font-semibold text-foreground flex items-center gap-1.5 mt-2">
                 <MapPin className="w-4 h-4 text-primary" /> {profile.location}
