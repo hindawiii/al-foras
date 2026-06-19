@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { INTEREST_OPTIONS } from "@/lib/mockData";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSettings } from "@/contexts/SettingsContext";
+import { guestStorage } from "@/lib/guestStorage";
 
 interface ProfileState {
   full_name: string; bio: string; education: string; location: string; avatar_url: string;
@@ -20,7 +21,7 @@ interface ProfileState {
 const empty: ProfileState = { full_name: "", bio: "", education: "", location: "", avatar_url: "", skills: [], interests: [] };
 
 export const ProfileTab = () => {
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
   const { t, dir } = useLanguage();
   const { hideProfile } = useSettings();
   const isRtl = dir === "rtl";
@@ -35,6 +36,12 @@ export const ProfileTab = () => {
 
   useEffect(() => {
     if (!user) return;
+    if (isGuest) {
+      const p = guestStorage.get<ProfileState>("profile");
+      if (p) { setProfile(p); setDraft(p); }
+      setLoading(false);
+      return;
+    }
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle()
       .then(({ data }) => {
         if (data) {
@@ -48,7 +55,7 @@ export const ProfileTab = () => {
         }
         setLoading(false);
       });
-  }, [user]);
+  }, [user, isGuest]);
 
   const completion = useMemo(() => {
     const fields = [
@@ -69,6 +76,21 @@ export const ProfileTab = () => {
     if (!file.type.startsWith("image/")) { toast.error("الرجاء اختيار صورة"); return; }
     if (file.size > 4 * 1024 * 1024) { toast.error("الصورة أكبر من 4 ميجابايت"); return; }
     setUploading(true);
+    if (isGuest) {
+      // وضع الضيف: تخزين الصورة محليًا كـ dataURL
+      const reader = new FileReader();
+      reader.onload = () => {
+        const url = String(reader.result || "");
+        const next = { ...profile, avatar_url: url };
+        setProfile(next); setDraft(d => ({ ...d, avatar_url: url }));
+        guestStorage.set("profile", next);
+        setUploading(false);
+        toast.success("تم تحديث صورتك");
+      };
+      reader.onerror = () => { setUploading(false); toast.error("تعذر قراءة الصورة"); };
+      reader.readAsDataURL(file);
+      return;
+    }
     const rawExt = (file.name.split(".").pop() || "jpg").toLowerCase();
     const ext = /^[a-z0-9]{1,5}$/.test(rawExt) ? rawExt : "jpg";
     const path = `${user.id}/avatar-${Date.now()}.${ext}`;
@@ -98,6 +120,14 @@ export const ProfileTab = () => {
   const save = async () => {
     if (!user) return;
     setSaving(true);
+    if (isGuest) {
+      guestStorage.set("profile", draft);
+      setSaving(false);
+      setProfile(draft);
+      setEditing(false);
+      toast.success(t("saved2"));
+      return;
+    }
     const { error } = await supabase.from("profiles").update(draft).eq("id", user.id);
     setSaving(false);
     if (error) { toast.error(t("saveFailed")); return; }
@@ -125,7 +155,7 @@ export const ProfileTab = () => {
 
   // ===== Profile Dashboard View =====
   if (!editing) {
-    const initial = (profile.full_name || user?.email || "?")[0].toUpperCase();
+    const initial = (profile.full_name || user?.email || "ض")[0].toUpperCase();
     // Circular progress ring math
     const size = 140;
     const stroke = 6;
@@ -208,9 +238,14 @@ export const ProfileTab = () => {
             <p className="text-base font-semibold text-gold-gradient/90 truncate max-w-full flex items-center gap-1.5 mt-2 justify-center" dir="ltr">
               <Mail className="w-4 h-4 text-primary" />
               <span className="text-primary font-semibold">
-                {hideProfile ? "•••••@•••••" : user?.email}
+                {hideProfile ? "•••••@•••••" : (user?.email || "👤 ضيف")}
               </span>
             </p>
+            {isGuest && !hideProfile && (
+              <div className="mt-3 px-4 py-2 rounded-xl bg-primary/10 border border-primary/30 text-xs text-primary max-w-sm">
+                👋 أنت تستخدم التطبيق كضيف — سنضيف تسجيل الدخول قريبًا لحفظ بياناتك على السحابة.
+              </div>
+            )}
             {profile.location && !hideProfile && (
               <p className="text-base font-semibold text-foreground flex items-center gap-1.5 mt-2">
                 <MapPin className="w-4 h-4 text-primary" /> {profile.location}
