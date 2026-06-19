@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { INTEREST_OPTIONS } from "@/lib/mockData";
+import { INTEREST_OPTIONS, interestLabel } from "@/lib/mockData";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import { guestStorage } from "@/lib/guestStorage";
@@ -22,7 +22,7 @@ const empty: ProfileState = { full_name: "", bio: "", education: "", location: "
 
 export const ProfileTab = () => {
   const { user, isGuest } = useAuth();
-  const { t, dir } = useLanguage();
+  const { t, lang, dir } = useLanguage();
   const { hideProfile } = useSettings();
   const isRtl = dir === "rtl";
   const alignClass = isRtl ? "text-right" : "text-left";
@@ -73,8 +73,8 @@ export const ProfileTab = () => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file || !user) return;
-    if (!file.type.startsWith("image/")) { toast.error("الرجاء اختيار صورة"); return; }
-    if (file.size > 4 * 1024 * 1024) { toast.error("الصورة أكبر من 4 ميجابايت"); return; }
+    if (!file.type.startsWith("image/")) { toast.error(t("pickImage")); return; }
+    if (file.size > 4 * 1024 * 1024) { toast.error(t("imageTooLarge")); return; }
     setUploading(true);
     if (isGuest) {
       // وضع الضيف: تخزين الصورة محليًا كـ dataURL
@@ -85,9 +85,9 @@ export const ProfileTab = () => {
         setProfile(next); setDraft(d => ({ ...d, avatar_url: url }));
         guestStorage.set("profile", next);
         setUploading(false);
-        toast.success("تم تحديث صورتك");
+        toast.success(t("photoUpdated"));
       };
-      reader.onerror = () => { setUploading(false); toast.error("تعذر قراءة الصورة"); };
+      reader.onerror = () => { setUploading(false); toast.error(t("couldNotReadImage")); };
       reader.readAsDataURL(file);
       return;
     }
@@ -100,7 +100,7 @@ export const ProfileTab = () => {
     if (upErr) {
       console.error("Avatar upload error:", upErr);
       setUploading(false);
-      toast.error(`تعذر رفع الصورة: ${upErr.message}`);
+      toast.error(`${t("uploadFailed")}: ${upErr.message}`);
       return;
     }
     const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
@@ -109,12 +109,12 @@ export const ProfileTab = () => {
     setUploading(false);
     if (dbErr) {
       console.error("Avatar DB update error:", dbErr);
-      toast.error(`تعذر حفظ الصورة: ${dbErr.message}`);
+      toast.error(`${t("saveImageFailed")}: ${dbErr.message}`);
       return;
     }
     setProfile(p => ({ ...p, avatar_url: url }));
     setDraft(d => ({ ...d, avatar_url: url }));
-    toast.success("تم تحديث صورتك");
+    toast.success(t("photoUpdated"));
   };
 
   const save = async () => {
@@ -238,12 +238,12 @@ export const ProfileTab = () => {
             <p className="text-base font-semibold text-gold-gradient/90 truncate max-w-full flex items-center gap-1.5 mt-2 justify-center" dir="ltr">
               <Mail className="w-4 h-4 text-primary" />
               <span className="text-primary font-semibold">
-                {hideProfile ? "•••••@•••••" : (user?.email || "👤 ضيف")}
+                {hideProfile ? "•••••@•••••" : (user?.email || t("guestEmail"))}
               </span>
             </p>
             {isGuest && !hideProfile && (
               <div className="mt-3 px-4 py-2 rounded-xl bg-primary/10 border border-primary/30 text-xs text-primary max-w-sm">
-                👋 أنت تستخدم التطبيق كضيف — سنضيف تسجيل الدخول قريبًا لحفظ بياناتك على السحابة.
+                {t("guestNotice")}
               </div>
             )}
             {profile.location && !hideProfile && (
@@ -286,7 +286,7 @@ export const ProfileTab = () => {
               <div className="flex flex-wrap gap-1.5">
                 {profile.interests.map(i => (
                   <span key={i} className="text-xs bg-gold-gradient text-primary-foreground font-medium px-2.5 py-1 rounded-full">
-                    {i}
+                    {interestLabel(i, lang)}
                   </span>
                 ))}
               </div>
@@ -357,7 +357,7 @@ export const ProfileTab = () => {
                     : "bg-background/40 border-border text-foreground hover:border-primary/50"
                 }`}>
                 {active && <Check className="w-3 h-3" />}
-                {i}
+                {interestLabel(i, lang)}
               </button>
             );
           })}
