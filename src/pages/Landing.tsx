@@ -38,7 +38,8 @@ const Landing = () => {
   const { user } = useAuth();
 
   const goApp = () => nav(user ? "/app" : "/auth");
-  const goAuth = () => nav("/auth");
+  // TODO: إعادة تفعيل عند رجوع تسجيل الدخول — راجع AUTH_ROADMAP.md
+  // const goAuth = () => nav("/auth");
   const featured = SCHOLARSHIPS.slice(0, 4);
 
   const features = [
@@ -72,9 +73,11 @@ const Landing = () => {
           >
             {lang === "ar" ? "EN" : "العربية"}
           </button>
+          {/* TODO: إعادة تفعيل زر تسجيل الدخول لاحقًا — راجع AUTH_ROADMAP.md
           <Button variant="ghostGold" size="sm" onClick={goAuth}>
             {t("landingCtaSecondary")}
           </Button>
+          */}
         </div>
       </header>
 

@@ -9,9 +9,8 @@ const Index = () => {
   const nav = useNavigate();
   const [onboarded, setOnboarded] = useState(() => localStorage.getItem("foras-onboarded") === "true");
 
-  useEffect(() => {
-    if (!loading && !user) nav("/auth", { replace: true });
-  }, [loading, user, nav]);
+  // TODO: إعادة تفعيل عند رجوع تسجيل الدخول — راجع AUTH_ROADMAP.md
+  // useEffect(() => { if (!loading && !user) nav("/auth", { replace: true }); }, [loading, user, nav]);
 
   if (loading) {
     return (
