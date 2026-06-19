@@ -8,10 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const KARATS_DISPLAY = ["24K", "21K", "18K"];
 
 export const FinanceToolsHeader = () => {
+  const { t, lang, dir } = useLanguage();
+  const isRtl = dir === "rtl";
   const { rates } = useLiveRates();
   const { goldPricePerGram } = useCryptoGold();
   const { localCurrency, setLocalCurrency } = useSettings();
@@ -34,14 +37,14 @@ export const FinanceToolsHeader = () => {
 
   return (
     <div className="pb-2">
-      <div className="rounded-2xl border border-primary/30 bg-card-gradient p-3 shadow-luxe" dir="rtl">
+      <div className="rounded-2xl border border-primary/30 bg-card-gradient p-3 shadow-luxe" dir={dir}>
         <Tabs defaultValue="currency">
           <TabsList className="grid grid-cols-2 w-full bg-input border border-primary/20 h-9">
             <TabsTrigger value="currency" className="data-[state=active]:bg-gold-gradient data-[state=active]:text-primary-foreground gap-1.5 text-xs h-7">
-              <Coins className="w-3.5 h-3.5" /> محول العملات
+              <Coins className="w-3.5 h-3.5" /> {t("currencyConverter")}
             </TabsTrigger>
             <TabsTrigger value="gold" className="data-[state=active]:bg-gold-gradient data-[state=active]:text-primary-foreground gap-1.5 text-xs h-7">
-              <Gem className="w-3.5 h-3.5" /> حاسبة الذهب
+              <Gem className="w-3.5 h-3.5" /> {t("goldCalculator")}
             </TabsTrigger>
           </TabsList>
 
@@ -49,7 +52,7 @@ export const FinanceToolsHeader = () => {
           <TabsContent value="currency" className="pt-3 space-y-2">
             <div className="flex gap-1.5 items-center">
               <Input type="number" value={amount} onChange={e => setAmount(e.target.value)}
-                className="h-9 text-sm font-bold text-right bg-input border-primary/20" dir="ltr" />
+                className={`h-9 text-sm font-bold bg-input border-primary/20 ${isRtl ? "text-right" : "text-left"}`} dir="ltr" />
               <Select value={from} onValueChange={setFrom}>
                 <SelectTrigger className="w-28 h-9 bg-input border-primary/20 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent className="bg-popover border-primary/30 max-h-64 overflow-y-auto">
@@ -57,7 +60,7 @@ export const FinanceToolsHeader = () => {
                     <SelectItem key={c.code} value={c.code}>
                       <span className="mr-1">{c.flag}</span>
                       <span className="font-bold">{c.code}</span>
-                      <span className="text-[10px] text-muted-foreground mr-1">— {c.name}</span>
+                      <span className="text-[10px] text-muted-foreground mr-1">— {lang === "ar" ? c.name : (c.nameEn || c.name)}</span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -73,14 +76,14 @@ export const FinanceToolsHeader = () => {
                     <SelectItem key={c.code} value={c.code}>
                       <span className="mr-1">{c.flag}</span>
                       <span className="font-bold">{c.code}</span>
-                      <span className="text-[10px] text-muted-foreground mr-1">— {c.name}</span>
+                      <span className="text-[10px] text-muted-foreground mr-1">— {lang === "ar" ? c.name : (c.nameEn || c.name)}</span>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="bg-background/40 border border-primary/20 rounded-lg px-3 py-2 flex items-baseline justify-between gap-2">
-              <span className="text-[10px] text-muted-foreground">النتيجة</span>
+              <span className="text-[10px] text-muted-foreground">{t("resultLabel")}</span>
               <span className="text-base font-bold text-gold-gradient" dir="ltr">{result} <span className="text-[10px] text-muted-foreground">{to}</span></span>
             </div>
           </TabsContent>
@@ -89,8 +92,8 @@ export const FinanceToolsHeader = () => {
           <TabsContent value="gold" className="pt-3 space-y-2">
             <div className="flex gap-1.5 items-center">
               <Input type="number" value={grams} onChange={e => setGrams(e.target.value)}
-                placeholder="الوزن (غ)"
-                className="h-9 text-sm font-bold text-right bg-input border-primary/20" dir="ltr" />
+                placeholder={t("weightGramsPlaceholder")}
+                className={`h-9 text-sm font-bold bg-input border-primary/20 ${isRtl ? "text-right" : "text-left"}`} dir="ltr" />
               <Select value={localCurrency} onValueChange={setLocalCurrency}>
                 <SelectTrigger className="w-32 h-9 bg-input border-primary/20 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent className="bg-popover border-primary/30 max-h-64 overflow-y-auto">
@@ -98,7 +101,7 @@ export const FinanceToolsHeader = () => {
                     <SelectItem key={c.code} value={c.code}>
                       <span className="mr-1">{c.flag}</span>
                       <span className="font-bold">{c.code}</span>
-                      <span className="text-[10px] text-muted-foreground mr-1">— {c.name}</span>
+                      <span className="text-[10px] text-muted-foreground mr-1">— {lang === "ar" ? c.name : (c.nameEn || c.name)}</span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -115,13 +118,13 @@ export const FinanceToolsHeader = () => {
                   <div key={k} className="bg-background/40 border border-primary/20 rounded-lg p-2">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] text-primary font-bold bg-primary/10 px-1.5 py-0.5 rounded">{k}</span>
-                      <span className="text-[10px] text-muted-foreground">{w || 0} غ</span>
+                      <span className="text-[10px] text-muted-foreground">{w || 0} {t("weightG")}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-1.5">
                       {/* Global */}
-                      <div className="bg-background/50 border border-border rounded-md px-2 py-1 text-right">
-                        <div className="flex items-center gap-1 text-[9px] text-muted-foreground justify-end">
-                          <span>السعر العالمي</span>
+                      <div className={`bg-background/50 border border-border rounded-md px-2 py-1 ${isRtl ? "text-right" : "text-left"}`}>
+                        <div className={`flex items-center gap-1 text-[9px] text-muted-foreground ${isRtl ? "justify-end" : "justify-start"}`}>
+                          <span>{t("globalPrice")}</span>
                           <Globe className="w-2.5 h-2.5" />
                         </div>
                         <p className="font-display text-sm text-foreground/90 font-medium" dir="ltr">
@@ -130,9 +133,9 @@ export const FinanceToolsHeader = () => {
                         </p>
                       </div>
                       {/* Local */}
-                      <div className="bg-gold-gradient/10 border border-primary/30 rounded-md px-2 py-1 text-right">
-                        <div className="flex items-center gap-1 text-[9px] text-primary justify-end">
-                          <span>السعر المحلي</span>
+                      <div className={`bg-gold-gradient/10 border border-primary/30 rounded-md px-2 py-1 ${isRtl ? "text-right" : "text-left"}`}>
+                        <div className={`flex items-center gap-1 text-[9px] text-primary ${isRtl ? "justify-end" : "justify-start"}`}>
+                          <span>{t("localPrice")}</span>
                           <MapPin className="w-2.5 h-2.5" />
                         </div>
                         <p className="font-display text-sm text-gold-gradient font-bold" dir="ltr">
@@ -146,7 +149,7 @@ export const FinanceToolsHeader = () => {
               })}
             </div>
             <p className="text-[9px] text-muted-foreground text-center">
-              السعر المحلي = العالمي × سعر صرف {localCur?.name ?? localCurrency} الحي
+              {t("localFormula").replace("{x}", (lang === "ar" ? localCur?.name : localCur?.nameEn) ?? localCurrency)}
             </p>
           </TabsContent>
         </Tabs>
